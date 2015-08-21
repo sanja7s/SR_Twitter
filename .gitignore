@@ -1,15 +1,21 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+<<<<<<< HEAD
 *$py.class
+=======
+>>>>>>> c188cfc0453447719f78b5c69fd20155440a410e
 
 # C extensions
 *.so
 
+<<<<<<< HEAD
 # data files
 *.dat
 *.json
 
+=======
+>>>>>>> c188cfc0453447719f78b5c69fd20155440a410e
 # Distribution / packaging
 .Python
 env/
