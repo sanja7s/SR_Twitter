@@ -1,6 +1,10 @@
+Gephi_files/
+ALL_SR/
 DATA/
 CV/
 img/
+JSON/
+AI/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
