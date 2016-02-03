@@ -10,10 +10,23 @@ f_out = "en_usr_tweets1K.json"
 
 
 ENGLISH_STOPWORDS = set(stopwords.words('english'))
-
 def clean(tweet):
 	return [i.lower() for i in tweet if i.isalpha() and i not in ENGLISH_STOPWORDS and i != 'RT']
 
+def read_in_graph_with_SR(f_in):
+	graph_with_SR = defaultdict(list)
+	with codecs.open(f_in,'r', encoding='utf8') as input_file:
+	    for line in input_file:	
+	    	line = line.split()
+	    	usr1 = line[0]
+	    	usr2 = line[1]
+	    	weight = int(line[2])
+	    	SR = line[3]
+	    	if SR == 'None' or SR == '-1':
+	    		continue
+	    	SR = float(SR)
+	    	graph_with_SR[(usr1, usr2)] = (weight, SR)
+	return graph_with_SR
 
 def collect_tweet_text_per_user(f_in):
 
