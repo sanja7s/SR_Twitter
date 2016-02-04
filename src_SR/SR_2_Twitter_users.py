@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
 import pymongo
 from pymongo import MongoClient
 from nltk.stem.snowball import SnowballStemmer

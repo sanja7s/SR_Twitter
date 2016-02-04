@@ -1,6 +1,6 @@
 # SR_Twitter
 
-Apply ESA (Explicit Semantic Relatedness) algorithm for calculating semantic relatedness (SR) of tweets.
+Apply ESA (Explicit Semantic Analysis) algorithm for calculating semantic relatedness (SR) of tweets.
 
 Using semantic knowledge database that is implemented in [SR_Wiki_ESA](https://github.com/sanja7s/SR_Wiki_ESA/), find how 'similar' or (correctly) 'related' are tweets and also Twitter users, based on the collections of their tweets.
 

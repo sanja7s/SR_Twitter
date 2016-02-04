@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
 from nltk.tokenize import wordpunct_tokenize
 from nltk.corpus import stopwords
 import codecs
