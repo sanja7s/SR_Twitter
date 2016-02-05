@@ -7,7 +7,7 @@ import matplotlib.mlab as mlab
 from matplotlib import pyplot as plt
 
 f_in = "graph_data_with_SR.tab"
-f_out = "graph_data_with_SR_undirected.tab"
+f_out = "mention_graph_with_SR_undirected.tab"
 f_undirected_in = "graph_data_with_SR_undirected.tab"
 
 def read_in_graph_with_SR(f_in):
@@ -42,7 +42,7 @@ def read_in_undirected_graph_with_SR():
 	return graph_with_SR
 
 
-def save_undirected_graph_with_SR(f_out):
+def save_undirected_graph_with_SR():
 	directed_graph_with_SR = read_in_graph_with_SR(f_in)
 	undirected_graph_with_SR = defaultdict(list)
 	with codecs.open(f_out,'w', encoding='utf8') as output_file:
@@ -126,4 +126,4 @@ def SR_pdf():
 
 #SR_pdf()
 
-#save_undirected_graph_with_SR(f_out)
+save_undirected_graph_with_SR()

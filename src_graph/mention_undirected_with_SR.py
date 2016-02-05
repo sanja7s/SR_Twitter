@@ -10,8 +10,10 @@ import glob, os
 f_in_IDs = "user_IDs.dat"
 f_in_CVs = "CV_usrs.json"
 f_in = "graph_20_tweets_users.dat"
-f_out_id = "graph_20_tweets_IDs_with_SR.dat"
-f_out_u = "graph_20_tweets_usr_with_SR.dat"
+f_out_id = "mention_graph_IDs_with_SR_weight.dat"
+f_in_SR_weight = "mention_graph_IDs_with_SR_weight.dat"
+f_out_u = "mention_graph_with_SR_weight.dat"
+f_out_undirected = "undirected_mention_graph_with_SR_weight_v2.dat"
 IN_DIR = "../DATA/mention_graph"
 
 
@@ -109,21 +111,63 @@ def mention_usr_SR():
 		line = line.split()
 		userA = line[0]
 		userB = line[1]
+		weight = line[2]
 		CVA = USER_CVs[userA]["CV"]
 		CVB = USER_CVs[userB]["CV"]
 		SR = cosine_2_vectors(CVA, CVB)
-		f_out_users.write(str(userA) + '\t' + str(userB) + '\t' + str(SR) + '\n')
-		f_out_IDs.write(str(user_ids[userA]) + '\t' + str(user_ids[userB]) + '\t' + str(SR) + '\n')
+		#f_out_users.write(str(userA) + '\t' + str(userB) + '\t' + str(SR) + '\n')
+		#f_out_IDs.write(str(user_ids[userA]) + '\t' + str(user_ids[userB]) + '\t' + str(SR) + '\n')
+		f_out_users.write(str(userA) + '\t' + str(userB) + '\t' + str(SR) + '\t' + str(weight) + '\n')
+		f_out_IDs.write(str(user_ids[userA]) + '\t' + str(user_ids[userB]) + '\t' + str(SR) + '\t' + str(weight) + '\n')
 		
 		cnt += 1
 		if cnt % 1000000 == 0:
 			print ":) we have ", cnt, " user pairs SR calculated"
 	
 
+def read_in_graph_with_SR():
+
+	input_file =  open(f_in_SR_weight, "r")
+	directed_graph_with_SR = defaultdict(list)
+
+	cnt = 0
+	for line in input_file:
+		line = line.strip().split("\t")
+		id1 = line[0]
+		id2 = line[1]
+		SR = float(line[2])
+		weight = int(line[3])
+		directed_graph_with_SR[(id1,id2)] = (weight, SR)
+		if cnt == 100:
+			print id1, id2, directed_graph_with_SR[(id1,id2)]
+		cnt += 1
+
+	return directed_graph_with_SR
+
+
+def save_undirected_graph_with_SR():
+	directed_graph_with_SR = read_in_graph_with_SR()
+	undirected_graph_with_SR = defaultdict(list)
+
+	with codecs.open(f_out_undirected,'w', encoding='utf8') as output_file:
+		for edge in directed_graph_with_SR.keys():
+			w = directed_graph_with_SR[edge][0]
+			sr = directed_graph_with_SR[edge][1]
+			key2 = tuple(sorted((edge[1],edge[0])))
+			if key2 not in undirected_graph_with_SR:
+				undirected_graph_with_SR[key2] = (w, sr)
+			else:
+				old_w = undirected_graph_with_SR[key2][0]
+				#sr = undirected_graph_with_SR[key2][1]
+				undirected_graph_with_SR[key2] = (w + old_w, sr)
+				#print key2, w, old_w, sr
+				output_file.write(str(edge[0]) + '\t' + str(edge[1]) + '\t' + str(w + old_w) + '\t' + str(sr) + '\n')
+
 
 def main():
 	os.chdir(IN_DIR) 
-	mention_usr_SR()
+	#mention_usr_SR()
+	save_undirected_graph_with_SR()
 
 main()
 
