@@ -76,12 +76,13 @@ def read_save_taxonomy(users="ALL", user_list=None, WRITE=False,TOP_N = 20):
                     if el["confident"] == "no":
                         continue
                 except: KeyError
-                taxonomy_tree = el["label"]
-                taxonomy_tree = taxonomy_tree.split("/")
+                taxonomy_tree7s = el["label"]
+                taxonomy_tree = taxonomy_tree7s.split("/")
                 taxonomy_tree.pop(0)
                 levels = len(taxonomy_tree)
 
                 s = taxonomies_sum
+                """
                 # go until the last element; on the last, we will not create a dict NONO
                 for tax_class in taxonomy_tree:
                     #print tax_class
@@ -92,15 +93,37 @@ def read_save_taxonomy(users="ALL", user_list=None, WRITE=False,TOP_N = 20):
                     s = s[tax_class]
                 #last_tax_class = taxonomy_tree[levels-1]
                 #s = s[last_tax_class]
+                """
+                if taxonomy_tree7s not in s.keys():
+                    s[taxonomy_tree7s] = defaultdict(int)
+                s = s[taxonomy_tree7s]
+
 
                 old_score = s["size"]
                 #old_cnt = s[tax_class][1]
                 #old_sent = s[tax_class][2]
                 new_score = old_score + float(el["score"])
                 s["size"] = new_score
-                # this shows that it takes as confident only those above 0.4
-                if float(el["score"]) < 0.4:
-                    print float(el["score"])
+               
+                if sentiment <> "neutral":
+                    old_sent = s["sentiment"]
+                    new_sent = old_sent + float(docSentiment["score"])
+                    s["sentiment"] = new_sent
+
+                    if sentiment == "positive":
+                        pos_sent = s["pos_sent"]
+                        pos_cnt = s["pos_sent_cnt"]
+                        pos_sent = pos_sent + float(docSentiment["score"])
+                        pos_cnt = pos_cnt + 1
+                        s["pos_sent"] = pos_sent
+                        s["pos_sent_cnt"] = pos_cnt
+                    elif sentiment == "negative":
+                        neg_sent = s["neg_sent"]
+                        neg_cnt = s["neg_sent_cnt"]
+                        neg_sent = neg_sent + float(docSentiment["score"])
+                        neg_cnt = neg_cnt + 1
+                        s["neg_sent"] = neg_sent
+                        s["neg_sent_cnt"] = neg_cnt
 
             cnt += 1
 
@@ -113,6 +136,30 @@ def read_save_taxonomy(users="ALL", user_list=None, WRITE=False,TOP_N = 20):
         print "Total taxonomies on different levels found ", len(taxonomies_sum)
         print "Total Sentiments found ", len(docSentiment_sum)
 
+         
+        sorted_taxonomies_by_neg_sent =  OrderedDict(sorted(taxonomies_sum.items(), key = lambda x: x[1]["sentiment"]))
+        sorted_taxonomies_by_pos_sent =  OrderedDict(sorted(taxonomies_sum.items(), key = lambda x: x[1]["sentiment"], reverse = True))
+
+        print_top_sent = 20
+        i = 0
+        for top_taxonomy in sorted_taxonomies_by_neg_sent:
+            print top_taxonomy, "\t" ,sorted_taxonomies_by_neg_sent[top_taxonomy]["size"], "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["sentiment"], \
+             "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["neg_sent"], "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["neg_sent_cnt"], \
+             "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["pos_sent"], "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["pos_sent_cnt"]
+
+            i += 1
+            if i == print_top_sent:
+                break
+        print
+        print
+        i = 0
+        for top_taxonomy in sorted_taxonomies_by_pos_sent:
+            print top_taxonomy, "\t", sorted_taxonomies_by_pos_sent[top_taxonomy]["size"], "\t", sorted_taxonomies_by_pos_sent[top_taxonomy]["sentiment"], \
+            "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["pos_sent"], "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["pos_sent_cnt"], \
+             "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["neg_sent"], "\t", sorted_taxonomies_by_neg_sent[top_taxonomy]["neg_sent_cnt"]
+            i += 1
+            if i == print_top_sent:
+                break
 
 
         if WRITE:
@@ -183,7 +230,7 @@ def main():
 
     os.chdir(IN_DIR)
 
-    read_save_taxonomy(WRITE=True)
+    read_save_taxonomy(WRITE=False)
     
 
 main()

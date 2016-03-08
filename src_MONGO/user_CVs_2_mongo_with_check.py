@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
 import sys, io, json, os
 import pymongo
 from pymongo import MongoClient
@@ -46,8 +49,7 @@ def set_global_conn_params(client = MongoClient(), dbs="test", CV_collection="CV
 def count_tweets_per_user():
 	cnt_all_tweets = 0
 	user_tweets = defaultdict(int)
-	with codecs.open(f_in,'r', encoding='utf8') as input_file:
-		# the code loops through the input, counts tweets for each user 
+	with codecs.open(f_in,'r', encoding='utf8') as input_file: # the code loops through the input, counts tweets for each user
 	    for line in input_file:	
 	    	cnt_all_tweets += 1
 	    	line = line.split()

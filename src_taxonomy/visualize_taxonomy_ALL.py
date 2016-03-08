@@ -12,7 +12,6 @@ import itertools
 f_in = "tweets_taxonomy_clean.JSON"
 f_in_user_ids = "user_IDs.dat"
 IN_DIR = "../DATA/taxonomy_stats/"
-spec_users = "communitiesMent.txt"
 
 def read_user_IDs():
 
@@ -26,29 +25,6 @@ def read_user_IDs():
             user_ids[user] = user_id
 
     return user_ids
-
-# to return top sizeN communities, as many as there are
-# in a form of a dictionary: {community_id: defaultdict{id_usr1:1, id_usr2:1, ...}}
-def read_in_communities(sizeN=300):
-
-    res = defaultdict(int)
-    res7s = defaultdict(int)
-
-    f = open(spec_users, "r")
-
-    for line in f:
-        line = line.split()
-        user_id = line[0]
-        com_id = line[1]
-        if com_id not in res:
-            res[com_id] = defaultdict(int)
-        res[com_id][user_id] = 1
-
-    for com in res:
-        if len(res[com]) >= sizeN:
-            res7s[com] = res[com]
-
-    return res7s
 
 
 def read_save_taxonomy(users="ALL", user_list=None, WRITE=False,TOP_N = 20):
@@ -64,11 +40,6 @@ def read_save_taxonomy(users="ALL", user_list=None, WRITE=False,TOP_N = 20):
         for line7s in input_file:
             try:
                 line = json.loads(line7s)
-                if users <> "ALL":
-                    user_name = line["_id"]
-                    user_id = user_ids[user_name]
-                    if user_list[user_id] == 0:
-                        continue 
                 taxonomy_all = line["taxonomy"]
                 keywords = taxonomy_all["keywords"]
                 entities = taxonomy_all["entities"]
@@ -127,9 +98,15 @@ def read_save_taxonomy(users="ALL", user_list=None, WRITE=False,TOP_N = 20):
                 #old_sent = s[tax_class][2]
                 new_score = old_score + float(el["score"])
                 s["size"] = new_score
+
                 # this shows that it takes as confident only those above 0.4
                 if float(el["score"]) < 0.4:
                     print float(el["score"])
+                
+                if sentiment <> "neutral":
+                    old_sent = s["sentiment"]
+                    new_sent = old_sent + float(docSentiment["score"])
+                    s["sentiment"] = new_sent
 
             cnt += 1
 
@@ -142,20 +119,10 @@ def read_save_taxonomy(users="ALL", user_list=None, WRITE=False,TOP_N = 20):
         print "Total taxonomies on different levels found ", len(taxonomies_sum)
         print "Total Sentiments found ", len(docSentiment_sum)
 
-        print "Sentiment: [type, score, count, mixed_count]"
-        i = 0
-        for el in docSentiment_sum:
-            print el, docSentiment_sum[el]
-            i += 1
-            if i == TOP_N:
-                break
-        print
-
-        TOP_N = 100
 
 
         if WRITE:
-            f_out_name = "com_taxonomy/taxon_COM_" + str(users) + ".json"
+            f_out_name = "ALL/taxon_ALL.json"
 
             #taxonomies_out7s = recursive_writeable_json_from_dict(taxonomies_sum)
             print len(taxonomies_sum), type(taxonomies_sum)
@@ -221,15 +188,8 @@ def recursive_writeable_json_from_dict(d, dname):
 def main():
 
     os.chdir(IN_DIR)
-    
 
-    sizeN = 300
-    top_communities = read_in_communities(sizeN)
-    print len(top_communities), "top communities found"
-
-    
-    for community in top_communities:
-        read_save_taxonomy(str(community), top_communities[community], WRITE=True)
+    read_save_taxonomy(WRITE=True)
     
 
 main()
