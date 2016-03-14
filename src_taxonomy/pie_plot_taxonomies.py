@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 '''
 	plot the pie plots of the top concepts, entities, taxonomies etc. per community and for the whole dataset
+	also output the stats for the top keywords, concepts, entities and for the sentiment per community (and the whole dataset)
 '''
 from __future__ import unicode_literals
 
@@ -16,8 +17,13 @@ import matplotlib.pyplot as plt
 f_in = "tweets_taxonomy_clean.JSON"
 f_in_user_ids = "user_IDs.dat"
 IN_DIR = "../../../DATA/taxonomy_stats/"
-spec_users = "mention/communitiesMent.txt"
+#spec_users = "mention/communitiesMent.txt"
+spec_users = "SR/communitiesSR_0.9.txt"
 
+
+##################################################
+# read in a map for the twitter username --> id
+##################################################
 def read_user_IDs():
 
 	user_ids = defaultdict(str)
@@ -31,11 +37,13 @@ def read_user_IDs():
 
 	return user_ids
 
+####################################################################################################
 # return top communities larger than sizeN, as many as there are of that size
 # in a form of a dictionary: {community_id: defaultdict{id_usr1:1, id_usr2:1, ...}}
-# and also another dict, as a map (res3) to tell us the community id of a user
+# and also return another dict, as a map (res3) to tell us the community id of a user
 # and finally the whole set of communities (not limited in size) 
 # and a similar map in res4
+####################################################################################################
 def read_in_communities(sizeN=300):
 
 	res = defaultdict(int)
@@ -67,6 +75,10 @@ def read_in_communities(sizeN=300):
 
 	return res7s, res3, res, res4
 
+####################################################################################################
+# in order to calculate TF-IDF for concepts, keywords and entities, we treat communities as documents
+# here we extract document frequency for each of them (a one pass through the taxonomy dataset)
+####################################################################################################
 def community_IDFs(user_com):
 
 	# resulting dictionaries in which the needed counts for com_IDFs are collected
@@ -137,10 +149,17 @@ def community_IDFs(user_com):
 
 	return keywords_res, entities_res, concepts_res
 
+##################################################
+# the core function
+##################################################
 """
 	here, the options are to visualize the taxonomy for the whole dataset (COM="ALL")
 	and to visualize for different communities (COM="COM") that are read in through read_in_communities()
 	in the case of communities, this functions is invoked once per each community
+	-- user_list holds the ids of the users in one community
+	-- TOP_N holds the number of top concepts, keywords and entities that we want to visualize and record
+	-- user_com holds a map for user_id --> com_id
+	-- N_COM holds the total number of communities found (changes depending on the community detection algorithm)
 """
 def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, N_COM=0):
 
@@ -148,6 +167,8 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 	keywords_sum = defaultdict(int)
 	entities_sum = defaultdict(int)
 	concepts_sum = defaultdict(int)
+	#
+	docSentiment_sum = defaultdict(int)
 	# holds all the user ids
 	user_ids = read_user_IDs()
 
@@ -156,17 +177,19 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 		for line7s in input_file:
 			try:
 				line = json.loads(line7s)
-				# if dealing with community, check the user membership
+				# if dealing with a community, check the user membership
 				if COM <> "ALL":
 					user_name = line["_id"]
 					user_id = user_ids[user_name]
 					if user_list[user_id] == 0:
 						continue
-				# if deal with ALL take all the users
+				# if dealing with ALL, take all the users
 				taxonomy_all = line["taxonomy"]
 				keywords = taxonomy_all["keywords"]
 				entities = taxonomy_all["entities"]
 				concepts = taxonomy_all["concepts"] 
+				#
+				docSentiment = taxonomy_all["docSentiment"] 
 				# this counts how many user we have analyzed
 				cnt += 1
 			except KeyError:
@@ -211,14 +234,50 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 				new_cnt = old_cnt + 1
 				concepts_sum[concept] = (new_relev, new_cnt)
 
+			# a bit different procedure for extracting the sentiment
+			sentiment = docSentiment["type"]
+			if sentiment == "neutral":
+				docSentiment_sum[sentiment] += 1
+			else:
+				if not sentiment in docSentiment_sum:
+					docSentiment_sum[sentiment] = defaultdict(int)
+				old_score = docSentiment_sum[sentiment][0]
+				old_cnt = docSentiment_sum[sentiment][1]
+				old_mixed_cnt = docSentiment_sum[sentiment][2]
+				try:
+					new_score = old_score + float(docSentiment["score"])
+				except KeyError:
+					continue
+				new_cnt = old_cnt + 1
+				try:
+					new_mixed_cnt = old_mixed_cnt + int(docSentiment["mixed"])
+				except KeyError:
+					continue
+				docSentiment_sum[sentiment] = (new_score, new_cnt, new_mixed_cnt)
+
 		com_size = cnt
 		# THIS IS A CONSTANT, because we know how many users there are in total after we did one ALL run
 		N = 27665
 		print "*** The community %s ***" % COM
-		print "Analyzed # of users ", com_size, " out of total users ", N    
+		print "Analyzed %d users out of total %d users " % (com_size, N)
+		pos_users = docSentiment_sum["positive"][1]
+		neg_users = docSentiment_sum["negative"][1]
+		try:
+			neu_users = docSentiment_sum["neutral"]
+		except TypeError:
+			neu_users = 0
+
+		pos_score = docSentiment_sum["positive"][0]
+		neg_score = docSentiment_sum["negative"][0]
+		print "___________________"
+		print "Sentiment stats: positive %d users; negative %d users; and neutral %d " % (pos_users, neg_users, neu_users)
+		print "Sentiment score: positive %f ; negative %f; and the sum sentiment %f " % (pos_score, neg_score, pos_score + neg_score)
+		print "Overall positive sentiment pct is %f " % (float(pos_users)/com_size)
+		print "___________________"
 		print "Total keywords found ", len(keywords_sum)
 		print "Total entities found ", len(entities_sum)
 		print "Total concepts found ", len(concepts_sum)
+		print "___________________"
 
 		# if we deal with communities, then the number of documents is the total number of communities
 		# and IDF values are found with help of the function community_IDFs
@@ -229,7 +288,7 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 		#####################
 		## STARTS plotting ##
 		#####################
-		os.chdir('pie_plots')
+		os.chdir('SR/pie_plots_0.9')
 
 		#####################
 		##    KEYWORDS     ##
@@ -344,7 +403,7 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 		plt.clf()
 		print
 
-		os.chdir("../")
+		os.chdir("../../")
 
 
 
@@ -376,7 +435,7 @@ def main(COM='ALL'):
 		NALL = len(all_communities)
 		print NALL, "all communities found"
 		for community in top_communities:
-			visualize_taxonomy_pies(str(community), user_list=top_communities[community], TOP_N=10, user_com=all_com_id_map, N_COM=NALL)
+			visualize_taxonomy_pies(str(community), user_list=top_communities[community], TOP_N=20, user_com=all_com_id_map, N_COM=NALL)
 
 # other possible argument is 'COM' or any other string to print pies for the communities
 # 'ALL' prints the pie stats for the whole dataset
