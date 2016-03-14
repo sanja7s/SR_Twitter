@@ -1,5 +1,10 @@
-import demjson
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+"""
+    test before writing to a suitbale JSON format for the treemap
+"""
 
+import demjson
 
 
 d1 = {u'books and literature': {u'poetry': {'size': 1.381699}}, \
