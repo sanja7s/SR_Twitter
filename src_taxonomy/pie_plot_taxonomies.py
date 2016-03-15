@@ -5,7 +5,7 @@
 	also output the stats for the top keywords, concepts, entities and for the sentiment per community (and the whole dataset)
 '''
 from __future__ import unicode_literals
-
+#
 import codecs
 from collections import defaultdict, OrderedDict
 import json
@@ -13,12 +13,16 @@ import glob, os
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+
+
+ARG = "SR"
 
 f_in = "tweets_taxonomy_clean.JSON"
 f_in_user_ids = "user_IDs.dat"
 IN_DIR = "../../../DATA/taxonomy_stats/"
-#spec_users = "mention/communitiesMent.txt"
-spec_users = "SR/communitiesSR_0.9.txt"
+# spec_users = ARG + "/communitiesMent.txt"
+spec_users =  ARG + "/communitiesSR_0.9.txt"
 
 
 ##################################################
@@ -85,6 +89,8 @@ def community_IDFs(user_com):
 	keywords_sum = defaultdict(int)
 	entities_sum = defaultdict(int)
 	concepts_sum = defaultdict(int)
+	#
+	taxonomies_sum = defaultdict(int)
 	# holds all the user ids (username --> user_id, map)
 	user_ids = read_user_IDs()
 
@@ -101,6 +107,8 @@ def community_IDFs(user_com):
 				keywords = taxonomy_all["keywords"]
 				entities = taxonomy_all["entities"]
 				concepts = taxonomy_all["concepts"] 
+				#
+				taxonomy = taxonomy_all["taxonomy"]
 				# this counts how many user we have analyzed
 				cnt += 1
 			except KeyError:
@@ -133,10 +141,21 @@ def community_IDFs(user_com):
 				# we just put in a list all the recorded communities where this is found
 				concepts_sum[concept].append(COM)
 
+			for el in taxonomy:
+				taxonomy_tree = el["label"]
+				taxon = taxonomy_tree
+				# if we first time encounter this taxon, add a list for it in the result
+				if not taxon in taxonomies_sum:
+					taxonomies_sum[taxon] = []
+				taxonomies_sum[taxon].append(COM)
+
+
 		# now we count for each keyword, entitiy or concept in how many distinct communities they were recorded
 		keywords_res = defaultdict(int)
 		entities_res = defaultdict(int)
 		concepts_res = defaultdict(int)
+		#
+		taxonomies_res = defaultdict(int)
 
 		for el in keywords_sum:
 			keywords_res[el] = len(set(keywords_sum[el]))
@@ -147,7 +166,10 @@ def community_IDFs(user_com):
 		for el in concepts_sum:
 			concepts_res[el] = len(set(concepts_sum[el]))
 
-	return keywords_res, entities_res, concepts_res
+		for el in taxonomies_sum:
+			taxonomies_res[el] = len(set(taxonomies_sum[el]))
+
+	return keywords_res, entities_res, concepts_res, taxonomies_res
 
 ##################################################
 # the core function
@@ -167,6 +189,7 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 	keywords_sum = defaultdict(int)
 	entities_sum = defaultdict(int)
 	concepts_sum = defaultdict(int)
+	taxonomies_sum = defaultdict(int) 
 	#
 	docSentiment_sum = defaultdict(int)
 	# holds all the user ids
@@ -188,6 +211,7 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 				keywords = taxonomy_all["keywords"]
 				entities = taxonomy_all["entities"]
 				concepts = taxonomy_all["concepts"] 
+				taxonomy = taxonomy_all["taxonomy"] 
 				#
 				docSentiment = taxonomy_all["docSentiment"] 
 				# this counts how many user we have analyzed
@@ -255,6 +279,18 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 					continue
 				docSentiment_sum[sentiment] = (new_score, new_cnt, new_mixed_cnt)
 
+
+			for el in taxonomy:
+				taxonomy_tree = el["label"]
+				taxon = taxonomy_tree
+				if not taxon in taxonomies_sum:
+					taxonomies_sum[taxon] = defaultdict(int)
+				old_score = taxonomies_sum[taxon][0]
+				old_cnt = taxonomies_sum[taxon][1]
+				new_score = old_score + float(el["score"])
+				new_cnt = old_cnt + 1
+				taxonomies_sum[taxon] = (new_score, new_cnt)
+
 		com_size = cnt
 		# THIS IS A CONSTANT, because we know how many users there are in total after we did one ALL run
 		N = 27665
@@ -277,19 +313,24 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 		print "Total keywords found ", len(keywords_sum)
 		print "Total entities found ", len(entities_sum)
 		print "Total concepts found ", len(concepts_sum)
+		print "Total taxonomies on different levels found ", len(taxonomies_sum)
 		print "___________________"
 
 		# if we deal with communities, then the number of documents is the total number of communities
 		# and IDF values are found with help of the function community_IDFs
 		if COM <> 'ALL':
-			keywords_res, entities_res, concepts_res = community_IDFs(user_com)
+			keywords_res, entities_res, concepts_res, taxonomies_res = community_IDFs(user_com)
 			N = N_COM
 
 		#####################
 		## STARTS plotting ##
 		#####################
-		os.chdir('SR/pie_plots_0.9')
-
+		if COM == 'ALL':
+			os.chdir('ALL/pie_plots')
+		else:
+			#os.chdir(ARG + '/pie_plots')
+			os.chdir(ARG + '/pie_plots_0.9')
+		
 		#####################
 		##    KEYWORDS     ##
 		#####################
@@ -383,7 +424,7 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 				tfidf = float(tot_cnt * math.log(1.0 + inv_fq))
 			concepts_sum[conc] = (tot_relev, tot_cnt, tfidf)
 
-		print "Concepts (sorted by TF-IDF): [relevance, count]"
+		print "Concepts (sorted by TF-IDF): [relevance, count, TF-IDF]"
 		ord_concepts_sum = OrderedDict(sorted(concepts_sum.items(), key=lambda x: x[1][2], reverse = True))
 		labels = np.empty([TOP_N], dtype="<U26")
 		sizes = np.empty([TOP_N], dtype=float)
@@ -402,6 +443,45 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 		plot_pie(labels, sizes_tot, "concept_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
 		plt.clf()
 		print
+
+		#####################
+		##   TAXONOMIES    ##
+		#####################
+		for taxon in taxonomies_sum:
+			tot_score = taxonomies_sum[taxon][0]
+			tot_cnt = taxonomies_sum[taxon][1]
+			# v1 COM = ALL
+			if COM == 'ALL':
+				inv_fq = 0 if tot_cnt == 0 else N/float(tot_cnt)
+				tfidf = float(tot_score * math.log(1.0 + inv_fq))
+			else:
+				# v2 THIS IS USED for COMMUNITIES
+				com_N = taxonomies_res[taxon]
+				inv_fq = 0 if com_N == 0 else N/float(com_N)
+				tfidf = float(tot_cnt * math.log(1.0 + inv_fq))
+			taxonomies_sum[taxon] = (tot_score, tot_cnt, tfidf)
+
+
+		print "Taxonomies (sorted by TF-IDF): [relevance, count, TF-IDF]"
+		ord_taxonomies_sum = OrderedDict(sorted(taxonomies_sum.items(), key=lambda x: x[1][2], reverse = True))
+		labels = np.empty([TOP_N], dtype="<U26")
+		sizes = np.empty([TOP_N], dtype=float)
+		sizes_tot = np.empty([TOP_N], dtype=float)
+		i = 0
+		for el in ord_taxonomies_sum:
+			print el, ord_taxonomies_sum[el]
+			labels[i] = el
+			sizes[i] = float(ord_taxonomies_sum[el][2])
+			sizes_tot[i] = float(ord_taxonomies_sum[el][0])
+			i += 1
+			if i == TOP_N:
+				break
+		plot_pie(labels, sizes, "taxon_tfidf_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plt.clf()
+		plot_pie(labels, sizes_tot, "taxon_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plt.clf()
+		print
+
 
 		os.chdir("../../")
 
@@ -427,8 +507,10 @@ def main(COM='ALL'):
 	os.chdir(IN_DIR)
 
 	if COM == "ALL":
+		sys.stdout = open('ALL/top_20_stats', 'w')
 		visualize_taxonomy_pies("ALL")
 	else:
+		sys.stdout = open(ARG + '/com_20_stats_0.9', 'w')
 		sizeN = 300
 		top_communities, com_id_map, all_communities, all_com_id_map = read_in_communities(sizeN)
 		print len(top_communities), "top communities found of size ", str(sizeN)
@@ -440,5 +522,20 @@ def main(COM='ALL'):
 # other possible argument is 'COM' or any other string to print pies for the communities
 # 'ALL' prints the pie stats for the whole dataset
 # cannot call these at the same time, but in two python script calls
+
+###############################################################################
 #main('ALL')
+
+# runme as 
+# python pie_plot_taxonomies.py > "/home/sscepano/Projects7s/Twitter-workspace/DATA/taxonomy_stats/ALL/pie_plots/ALL_stats.txt"
+###############################################################################
+
+
+###############################################################################
 main('COM')
+
+# runme as
+# python pie_plot_taxonomies.py > "/home/sscepano/Projects7s/Twitter-workspace/DATA/taxonomy_stats/SR/pie_plots_0.6/com_20_stats.txt"
+# or
+# python pie_plot_taxonomies.py > "/home/sscepano/Projects7s/Twitter-workspace/DATA/taxonomy_stats/SR_that_mention/pie_plots/com_20_stats.txt"
+###############################################################################
