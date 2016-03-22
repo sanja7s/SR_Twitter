@@ -57,25 +57,33 @@ def main():
 				user_id = user_ids[user_name]
 				docSentiment = taxonomy_all["docSentiment"] 
 				# this counts how many user we have analyzed
+				
+
+				# procedure for extracting the sentiment
+				if user_id == '':
+					continue
+				sentiment = docSentiment["type"]
+				if sentiment == "neutral":
+					snt = "0"
+					score = "0"
+				elif sentiment == "positive":
+					snt = "1"
+					score = docSentiment["score"]
+				else:
+					snt = "-1"
+					score = docSentiment["score"]
+				output_file.write(str(user_id) + '\t' + str(snt) + '\t' + str(score) +  '\n')
+
 				cnt += 1
+
 			except KeyError:
 				#print line7s
 				# we don't print since it is tested, there some 10% users for whom
 				# the taxonomy was not successfuly downloaded and they would be listed here
 				continue
 
-			# procedure for extracting the sentiment
-			sentiment = docSentiment["type"]
-			if sentiment == "neutral":
-				snt = "0"
-				score = "0"
-			elif sentiment == "positive":
-				snt = "1"
-				score = docSentiment["score"]
-			else:
-				snt = "-1"
-				score = docSentiment["score"]
-			output_file.write(str(user_id) + '\t' + str(snt) + '\t' + str(score) +  '\n')
+	print "Saved sentiment for %d users " % (cnt)
+
 ###############################################################################
 
 
