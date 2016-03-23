@@ -10,7 +10,7 @@
 """
 # for reading json files with possible unicode chars
 import codecs
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 import json
 #import re
 import glob, os
