@@ -22,7 +22,8 @@ N_PROCESSES = multiprocessing.cpu_count()
 RESULTS = []
 
 #f_in = "randomize_v1_CV_usrs.json"
-f_in = "randomize_v27s_CV_usrs.json"
+#f_in = "randomize_v27s_CV_usrs.json"
+f_in = "scaled_randomize_v27s_CVs_usrs.json"
 
 class MyManager(BaseManager):
     pass
@@ -98,8 +99,8 @@ def read_all_user_CVs(f_in):
 # find their SR and save in a file
 def all_usr_SR(NUM_USR, DIVIDE_USERS, USER_CVs, c):
 	#SR_dict = defaultdict(int)
-	f_name_out = "RND_v2/randomize_SR_part_" + str(c)
-	f_name_out_filter = "RND_v2/randomize_filter_SR_part_" + str(c)
+	f_name_out = "RND_v27s/randomize_SR_part_" + str(c)
+	f_name_out_filter = "RND_v27s/randomize_filter_SR_part_" + str(c)
 	f_out_c_filter = open(f_name_out_filter, "w")
 
 	with open(f_name_out, "w") as f_out_c:
@@ -120,7 +121,7 @@ def all_usr_SR(NUM_USR, DIVIDE_USERS, USER_CVs, c):
 					f_out_c_filter.write(str(userA) + '\t' + str(userB) + '\t' + str(SR) + '\n')
 				#SR_dict[(userA,userB)] = SR
 				cnt += 1
-				if cnt % 1000000 == 0:
+				if cnt % 10000000 == 0:
 					print str(c), " process :) we have ", cnt, " user pairs SR calculated "
 					#print "Example SR ", SR
 					#return

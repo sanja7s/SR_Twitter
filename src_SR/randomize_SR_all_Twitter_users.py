@@ -18,13 +18,12 @@ import random
 # input
 #####################################################
 WORKING_FOLDER = "../../../DATA/CV/"
-OUT_FOLDER = "threshold_mention_graphs"
 
-F_IN = "CV_usrs.json"
+F_IN = "CVs_usrs.json"
 
 F_OUT_v1 = "randomize_" + F_IN
 #####################################################
-F_OUT_v2 = "randomize_v27s_" + F_IN
+F_OUT_v2 = "scaled_randomize_v27s_" + F_IN
 
 
 # for a faster processing for all user pairs, we do not want to query MongoDB for the text 
@@ -49,6 +48,28 @@ def read_all_user_CVs():
 	        cnt += 1
 
 	return user_CVs #, raw_CVs
+
+
+# the same as above, just scale the CVs for each user by the number of tweets
+def read_all_user_CVs_v2():
+
+	user_CVs = defaultdict(int)
+	cnt = 0
+
+	with open(F_IN) as f:
+	    for line in f:
+	        line_dict = json.loads(line)
+	        usr = line_dict["_id"]
+	        user_CVs[cnt] = {}
+	        user_CVs[cnt]["num_tweets"] = line_dict["num_tweets"]
+	        scale_factor_num_tweets = float(user_CVs[cnt]["num_tweets"])
+	        CVa = line_dict["CV"]
+	        user_CVs[cnt]["CV"] = { k: float(v)/scale_factor_num_tweets for d in CVa for k, v in d.items() }
+	        if cnt % 1000 == 0:
+	        	print cnt, usr
+	        cnt += 1
+
+	return user_CVs 
 
 ########################################################
 #	v1 randomize outputs a json valid for this save function
@@ -94,7 +115,7 @@ def randomize_v1():
 ########################################################
 def randomize_v2():
 	# read in the original CVs json that we now want to randomize
-	user_CVs = read_all_user_CVs()
+	user_CVs = read_all_user_CVs_v2()
 	# the output in a format that we can save to a json with save_CVs_v2()
 	randomized_user_CVs = defaultdict(int)
 	# for working with an np matrix, we need ids in range 0 .. num_of_concepts 

@@ -3,6 +3,7 @@
 
 """
 	Let's extract main concepts (CVs) in each community
+	or for a given TOP USER list
 	Find their frequency histogram
 """
 # for reading json files with possible unicode chars
@@ -22,6 +23,13 @@ f_in_user_ids = "user_IDs.dat"
 IN_DIR = "../../../DATA/CV"
 
 #########################################################
+# TOP USER lists
+#########################################################
+TOP_GROUP = "hubs_SR_0.6/"
+DIR_top_users = "TOP_users/" + str(TOP_GROUP)
+PREFIX = "100_top_"
+
+#########################################################
 # SR
 #########################################################
 #X = "0.8"
@@ -37,6 +45,29 @@ working_subfolder = "mention_communities/"
 # the communities we analyze (from the mention graph)
 spec_users = working_subfolder + "communitiesMent" + str(X) + ".txt"
 #########################################################
+
+f_in_article_IDs = "articles_selected"
+#
+# read in all article IDs
+#
+def read_article_IDs(): #TODO fin
+
+	article_IDs = defaultdict(int)
+	cnt = 0
+
+	with open(f_in_article_IDs) as f:
+		for line in f:
+			line = line[:-1].split('\t')
+			aid = line[0]
+			aname = line[1]
+			article_IDs[aid] = aname
+			#if cnt % 10000 == 0:
+				#print line
+			cnt += 1
+
+	return article_IDs
+
+
 #
 # all the user ids (id map)
 #
@@ -50,6 +81,25 @@ def read_user_IDs():
 			user_id = line[0]
 			user =  line[1]
 			user_ids[user] = user_id
+
+	return user_ids
+
+##################################################
+# read in the users (top in something)
+##################################################
+def read_TOP_users():
+
+	user_ids = defaultdict(str)
+
+	for top_users_file in os.listdir(DIR_top_users):
+		if not top_users_file.startswith(PREFIX):
+			continue
+		with codecs.open(os.path.join(DIR_top_users, top_users_file),'r', encoding='utf8') as f:
+			user_ids[top_users_file] = defaultdict(int)
+			for line in f:
+				line = line.split()
+				user_id = line[0]
+				user_ids[top_users_file][user_id] = 1
 
 	return user_ids
 
@@ -147,6 +197,43 @@ def plot_popular_concepts(data,fig_name, com_id):
 	plt.title('Top concepts in different communities: count')
 	plt.legend()
 	plt.savefig(fig_name,format='png',dpi=440)
+#
+# extract all concepts in a community and sort them by popularity
+# 
+def find_popular_concepts_user_list(lst_name, lst, user_CVs):
+
+	CV_sum = defaultdict(int)
+	aids = read_article_IDs()
+
+	for usr in lst:
+		CV = user_CVs[usr]
+		if CV <> 0:
+			cv = CV["CV"]
+			num_tweets = CV["num_tweets"]
+			for concept in cv:
+				CV_sum[concept] += float(cv[concept]) # / float(num_tweets) # do we need the scaling??
+
+	top_CVs = OrderedDict(sorted(CV_sum.items(), key=lambda x: x[1], reverse= True))
+	fig_name = working_subfolder + "top_concepts" + lst_name + ".png"
+	plot_popular_concepts_user_list(top_CVs,fig_name, lst_name)
+
+	f_out = DIR_top_users + "top_concepts_" + lst_name + ".tab"
+	f = open(f_out, "w")
+	for c in top_CVs:
+		f.write(str(c) +  '\t' + str(top_CVs[c]) + '\t' + str(aids[c]) + '\n')
+
+	print "Processed %s and found %d different concepts" % (lst_name, len(CV_sum))
+
+def plot_popular_concepts_user_list(data,fig_name, com_id):
+	N = len(data)
+	x = np.arange(0,N,1)
+	y = np.array(data.values())
+	plt.loglog(x, y, label=com_id)
+	plt.grid(True)
+	plt.title("Top concepts in " + com_id + " : count")
+	plt.legend()
+	plt.savefig(fig_name,format='png',dpi=440)
+
 
 ###
 ### call the others
@@ -176,4 +263,19 @@ def main():
 	#################################################################
 	
 
-main()
+###
+### call the others
+###
+def main_user_list():
+
+	os.chdir(IN_DIR)
+
+	user_CVs = read_all_user_CVs()
+	TOP_users_lists = read_TOP_users()
+
+	for top_list in TOP_users_lists:
+		find_popular_concepts_user_list(top_list, TOP_users_lists[top_list], user_CVs)
+
+#main()
+
+main_user_list()

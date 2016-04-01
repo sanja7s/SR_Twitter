@@ -6,10 +6,14 @@ import codecs
 import matplotlib.pyplot as plt
 import pylab as P
 import numpy as np
+import glob, os
 
+IN_DIR = "../../../DATA/General/"
 F_IN = "usrs_with_more_than_20_tweets.dat"
 #F_OUT = "tweets_with_usrs_with_more_than_20_tweets.dat"
 #f_out = "usrs_with_more_than_20_tweets.dat"
+F_USR_TWEETS = "usr_num_tweets.tab"
+f_in_user_ids = "user_IDs.dat"
 
 USR_TWEETS = defaultdict(int)
 
@@ -61,6 +65,9 @@ def filter_dataset(thrshld=20):
 	print "New number of users: ", len(filtered_lst)
 '''
 
+#
+# put to the global vairable USR_TWEETS number of tweets per username
+#
 def tweets_per_user():
 	cnt_all_tweets = 0
 	global USR_TWEETS
@@ -77,6 +84,39 @@ def tweets_per_user():
 	print "MAX tweets ", max_tweets, " has/ve the user/s ", \
 	[usr for usr, tweets in USR_TWEETS.iteritems() if USR_TWEETS[usr] == max_tweets]
 	input_file.close()
+
+#
+# all the user ids (id map)
+#
+def read_user_IDs():
+
+	user_ids = defaultdict(str)
+
+	with codecs.open(f_in_user_ids,'r', encoding='utf8') as f:
+		for line in f:
+			line = line.split()
+			user_id = line[0]
+			user =  line[1]
+			user_ids[user] = user_id
+
+	return user_ids
+#
+# user outputs of tweets_per_user() and read_user_IDs()
+# to create number of tweets per user ID
+#
+def tweets_per_user_id():
+
+	tweets_per_id = defaultdict(int)
+
+	tweets_per_user()
+	usr_tweets = USR_TWEETS
+	usr_ids = read_user_IDs()
+	for usr in usr_tweets:
+		if usr in usr_ids:
+			tweets_per_id[usr_ids[usr]] = usr_tweets[usr]
+
+	return tweets_per_id
+
 
 def plot_hist_usr_tweets():
 	usr_tweets = tweets_per_user()
@@ -101,9 +141,20 @@ def filter_dataset_double_usr_filter(thrshld=20):
 	print "New number of tweets: ", cnt_selected_tweets
 	print "New number of users: ", len(filtered_lst)
 
+def save_usr_num_tweets(thrshld=20):
+	
+	usr_tweets = tweets_per_user_id()
+	f = codecs.open(F_USR_TWEETS, 'w', encoding='utf8')
+	for el in usr_tweets:
+		f.write(str(el) + "\t" +  str(usr_tweets[el]) + "\n")
+
+
 #plot_hist_usr_tweets()
 #filter_dataset()
 
 #tweets_per_user()
 #print len(filter_users())
-filter_dataset_double_usr_filter()
+#filter_dataset_double_usr_filter()
+
+os.chdir(IN_DIR)
+save_usr_num_tweets()

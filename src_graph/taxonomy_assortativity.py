@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 '''
-	analyze assortativity of the graph in terms of sentiment
+	analyze assortativity of the graph in terms of taxonomies
 '''
 from igraph import *
 
@@ -9,8 +9,6 @@ import os
 
 f_in_user_sentiment = "user_sentiment.tab"
 
-#########################
-# do again with weights
 #########################
 f_in_graph = "threshold_mention_graphs/directed_threshold0.tab"
 f_out_sent_graph = "directed_threshold0_sent_val.tab"
