@@ -1,57 +1,107 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 '''
-	analyze assortativity of the graph in terms of sentiment
+	analyze assortativity of the graphs in terms of sentiment
 '''
 from igraph import *
-
+import networkx as nx
 import os
 
 f_in_user_sentiment = "user_sentiment.tab"
-
 #########################
-# do again with weights
+# mention graph
 #########################
 f_in_graph = "threshold_mention_graphs/directed_threshold0.tab"
-f_out_sent_graph = "directed_threshold0_sent_val.tab"
+f_in_graph_weights = "threshold_mention_graphs/mention_graph_weights.dat"
+f_out_sent_mention_graph = "directed_threshold0_sent_val.tab"
 IN_DIR = "../../../DATA/mention_graph/"
-f_out = "sentiment_assortativity_mention.txt"
+f_out_mention = "sentiment_assortativity_mention_2.txt"
 #########################
+
 #########################
-X = "9"
+# SR
+#########################
+X = "4"
 f_in_graph_SR = "threshold_graphs/undir_threshold" + str(X) + ".tab"
-f_out_sent_graph = "../../Gephi/SR/gephi_undir_threshold" + str(X) + "_edge_list.tab"
-IN_DIR = "../../../DATA/SR_graphs/"
+f_in_graph_SR_weights = "filter_IDs_SR_0." + str(X)
+#f_out_sent_SR_graph = "../../Gephi/SR/gephi_undir_threshold" + str(X) + "_edge_list.tab"
+IN_DIR_SR = "../../../DATA/SR_graphs/"
 f_out_SR = "sentiment_assortativity_SR"  + str(X) + ".txt"
 #########################
 
 
-def read_in_mention_graph_with_sentiment():
-	G = Graph.Read_Ncol(f_in_graph)
+def mention_igraph_assortativity():
+	os.chdir(IN_DIR)
+	G = Graph.Read_Ncol(f_in_graph_weights,names=True, directed=True, weights=True)
+	summary(G)
 
 	f = open(f_in_user_sentiment, "r")
 
+	cnt = 0
 	for line in f:
-		line = line[:-1].split('\t')
-		vid = int(line[0])
-		vsent = int(line[1])
-		vsentval = float(line[2])
-		try:
-			G.vs.find(vid)["label"] = vid
-			G.vs.find(vid)["sent_val"] = vsentval
-			G.vs.find(vid)["sent"] = vsent
-		except IndexError:
-			continue
+		(vid, vsent, vsentval) = line[:-1].split('\t')
+		vsent = int(vsent)
+		vsentval = float(vsentval)
+		v = G.vs.select(name = vid)
+		v["sent_val"] = vsentval
+		v["sent"] = vsent
+		vsent_nominal = vsent
+		if vsent_nominal == -1:
+			vsent_nominal = 2
+		v["sent_nominal"] = vsent_nominal
+
+	print cnt
 
 	to_delete_vertices = [v.index for v in G.vs if v["sent"] == None]
+	print len(to_delete_vertices)
 	G.delete_vertices(to_delete_vertices)
-			
-	# save only once
-	save_graph_with_sentiment(G)
+	summary(G)
 
-	return G
+	print "Sentiment (by label) nominal assortativity is %f " %  (G.assortativity_nominal(types="sent_nominal",directed=True))
+	print "Sentiment (by label) assortativity is %f " %  (G.assortativity("sent",directed=True))
+	#print "Sentiment (by label) assortativity is %f " %  (G.assortativity(types1="sent",types2="sent",directed=True))
+
+	#print "Sentiment (by value) assortativity is %f " %  (G.assortativity_nominal(types="sent_val",directed=True))
+	print "Sentiment (by value) assortativity is %f " %  (G.assortativity("sent_val",directed=True))
+	#print "Sentiment (by value) assortativity is %f " %  (G.assortativity(types1="sent_val",types2="sent_val",directed=True))
+
+def mention_nx_assortativity():
+	os.chdir(IN_DIR)
+
+	MENT=nx.read_edgelist(f_in_graph_weights, create_using=nx.DiGraph(), data=(('weight',int),))
+	print(len(MENT.nodes(data=True)))
+
+	cnt = 0
+	d=defaultdict(int)
+	d_val = defaultdict(int)
+	d1 = defaultdict(int)
+	with open(f_in_user_sentiment) as f:
+	    for line in f:
+	        (uid, label, val) = line.split()
+	        uid = unicode(uid)
+	        d1[uid]= int(float(val)*10000)
+	        if uid in MENT.nodes():
+	        	d[uid]= int(float(val)*10000)
+	        	d_val[uid] = int(label)
+	        else:
+	        	cnt += 1
+	print "Number of nodes for which we have sentminet but are not in the mention graph is ", cnt
+
+	cnt = 0
+	for node in MENT.nodes():
+		if not node in d1:
+			cnt += 1
+			MENT.remove_node(node)
+	print "Number of nodes that do not have sentminet value, so we remove them from the mention graph", cnt
+
+	nx.set_node_attributes(MENT, 'sentiment' , d)
+	nx.set_node_attributes(MENT, 'sentiment_val' , d_val)
+	print "Final number of nodes in the graph ", (len(MENT.nodes(data=True)))
+	print "Sentiment (by label) nominal numeric assortativity is %f " % nx.numeric_assortativity_coefficient(MENT, 'sentiment')
+	print "Sentiment (by value) numeric assortativity is %f " % nx.numeric_assortativity_coefficient(MENT, 'sentiment_val')
 
 def read_in_SR_graph_with_sentiment():
+
 	G = Graph.Read_Ncol(f_in_graph_SR, directed=False)
 	print f_in_graph_SR
 	summary(G)
@@ -63,7 +113,7 @@ def read_in_SR_graph_with_sentiment():
 		vsent = int(line[1])
 		vsentval = float(line[2])
 		try:
-			G.vs.find(vid)["label"] = vid
+			G.vs.find(vid)["name"] = vid
 			G.vs.find(vid)["sent_val"] = vsentval
 			G.vs.find(vid)["sent"] = vsent
 		except IndexError:
@@ -79,40 +129,109 @@ def read_in_SR_graph_with_sentiment():
 
 	return G
 
-def save_graph_with_sentiment(G):
-	#G.write_edgelist(f_out_sent_graph)
+def SR_igraph_assortativity():
+	os.chdir(IN_DIR_SR)
 
+	G = Graph.Read_Ncol(f_in_graph_SR, directed=False)
+	print f_in_graph_SR
 	summary(G)
-	f = open(f_out_sent_graph, 'w')
-	f.write('Source' +  '\t' + 'Target' +  '\t' + 'type'  + '\n')
-	for e in G.es:
-		sid = e.source
-		tid = e.target
-		s = G.vs.find(sid)["label"] 
-		t = G.vs.find(tid)["label"] 
-		f.write(str(s) + '\t' + str(t) +  '\t' + 'undirected' + '\n')
-		# print str(s) + '\t' + str(t) +  '\t' + 'undirected' + '\n'
 
-def main():
+	print "Degree assortativity UNWEIGHTED is %f " % \
+	(G.assortativity_degree(directed=False))
 
-	os.chdir(IN_DIR)
-
-	# sys.stdout = open('f_out_mention', 'w')
-	# G = read_in_mention_graph_with_sentiment()
-
-	G = read_in_SR_graph_with_sentiment()
+	G = Graph.Read_Ncol(f_in_graph_SR_weights,names=True, directed=False, weights=True)
+	print f_in_graph_SR
 	summary(G)
-	# this just confirms that the edge list is correct, and imported graph in Gephi will have less nodes due to these
-	not_connected_nodes = G.vs(_degree_eq=0)
-	print len(not_connected_nodes)
 
-	sys.stdout = open(f_out_SR, 'w')
+	print "Degree assortativity DEFAULT is %f " % \
+	(G.assortativity(directed=True,types1=G.strength(weights='weight')))
+	print "Degree assortativity IN-OUT is %f " % \
+	(G.assortativity(directed=True,types1=G.strength(weights='weight',mode=IN),types2=G.strength(weights='weight',mode=OUT)))
+	print "Degree assortativity OUT-IN is %f " % \
+	(G.assortativity(directed=True,types1=G.strength(weights='weight',mode=OUT),types2=G.strength(weights='weight',mode=IN)))
+	print "Degree assortativity IN-IN is %f " % \
+	(G.assortativity(directed=True,types1=G.strength(weights='weight',mode=IN),types2=G.strength(weights='weight',mode=IN)))
+	print "Degree assortativity OUT-OUT is %f " % \
+	(G.assortativity(directed=True,types1=G.strength(weights='weight',mode=OUT),types2=G.strength(weights='weight',mode=OUT)))
+
+	f = open(f_in_user_sentiment, "r")
+	cnt = 0
+	for line in f:
+		(vid, vsent, vsentval) = line[:-1].split('\t')
+		vsent = int(vsent)
+		vsentval = float(vsentval)
+		v = G.vs.select(name = vid)
+		v["sent_val"] = vsentval
+		v["sent"] = vsent
+		vsent_nominal = vsent
+		if vsent_nominal == -1:
+			vsent_nominal = 2
+		v["sent_nominal"] = vsent_nominal
+
+	print cnt
+
+	to_delete_vertices = [v.index for v in G.vs if v["sent"] == None]
+	print len(to_delete_vertices)
+	G.delete_vertices(to_delete_vertices)
 	summary(G)
-	
+
+	print "Sentiment (by label) nominal assortativity is %f " %  (G.assortativity_nominal(types="sent_nominal",directed=False))
+	print "Sentiment (by label) assortativity is %f " %  (G.assortativity("sent",directed=False))
+	#print "Sentiment (by label) assortativity is %f " %  (G.assortativity(types1="sent",types2="sent",directed=True))
+
+	#print "Sentiment (by value) assortativity is %f " %  (G.assortativity_nominal(types="sent_val",directed=True))
+	print "Sentiment (by value) assortativity is %f " %  (G.assortativity("sent_val",directed=False))
+	#print "Sentiment (by value) assortativity is %f " %  (G.assortativity(types1="sent_val",types2="sent_val",directed=True))
 
 
-	print "Degree assortativity is %f " % (G.assortativity_degree(directed=False))
-	print "Sentiment (label) assortativity is %f " %  (G.assortativity("sent"))
-	print "Sentiment (by value) assortativity is %f " %  (G.assortativity("sent_val"))
+	os.chdir("../")
 
-main()
+def SR_nx_assortativity():
+	#os.chdir("SR_graphs")
+	os.chdir(IN_DIR_SR)
+
+	SR=nx.read_edgelist(f_in_graph_SR, create_using=nx.Graph()) #, data=(('weight',int),))
+	print(len(SR.nodes(data=True)))
+
+	print "Degree assortativity of UNWEIGHTED is %f " % nx.degree_assortativity_coefficient(SR)
+	#print "Sentiment (by value) numeric assortativity is %f " % nx.numeric_assortativity_coefficient(MENT, 'sentiment_val')
+
+
+	SR=nx.read_edgelist(f_in_graph_SR, create_using=nx.Graph(), data=(('weight',int),))
+	print(len(SR.nodes(data=True)))
+	print "Degree assortativity of WEIGHTED is %f " % nx.degree_assortativity_coefficient(SR, weight='weight')
+
+	cnt = 0
+	d=defaultdict(int)
+	d_val = defaultdict(int)
+	d1 = defaultdict(int)
+	with open(f_in_user_sentiment) as f:
+	    for line in f:
+	        (uid, label, val) = line.split()
+	        uid = unicode(uid)
+	        d1[uid]= int(float(val)*10000)
+	        if uid in SR.nodes():
+	        	d[uid]= int(float(val)*10000)
+	        	d_val[uid] = int(label)
+	        else:
+	        	cnt += 1
+	print "Number of nodes for which we have sentminet but are not in the mention graph is ", cnt
+	cnt = 0
+	for node in SR.nodes():
+		if not node in d1:
+			cnt += 1
+			SR.remove_node(node)
+	print "Number of nodes that do not have sentiment value, so we remove them from the mention graph", cnt
+	nx.set_node_attributes(SR, 'sentiment' , d)
+	nx.set_node_attributes(SR, 'sentiment_val' , d_val)
+	print "Final number of nodes in the graph ", (len(SR.nodes(data=True)))
+
+	print "Sentiment (by label) nominal numeric assortativity is %f " % nx.numeric_assortativity_coefficient(SR, 'sentiment')
+	print "Sentiment (by value) numeric assortativity is %f " % nx.numeric_assortativity_coefficient(SR, 'sentiment_val')
+
+
+#mention_nx_assortativity()
+#mention_igraph_assortativity()
+
+#SR_igraph_assortativity()
+SR_nx_assortativity()
