@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-
 """
 	Let's extract main concepts (CVs) in each community
 	or for a given TOP USER list
@@ -14,21 +13,17 @@ import glob, os
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-
-
 # here we have the CVs per user
 f_in = "CVs_usrs.json"
 # the id map we defined for the Twitter usernames
 f_in_user_ids = "user_IDs.dat"
 IN_DIR = "../../../DATA/CV"
-
 #########################################################
 # TOP USER lists
 #########################################################
-TOP_GROUP = "hubs_SR_0.6/"
-DIR_top_users = "TOP_users/" + str(TOP_GROUP)
-PREFIX = "100_top_"
-
+#TOP_GROUP = "hubs_SR_0.6/"
+#DIR_top_users = "TOP_users/" + str(TOP_GROUP)
+#PREFIX = "100_top_"
 #########################################################
 # SR
 #########################################################
@@ -40,12 +35,19 @@ PREFIX = "100_top_"
 #########################################################
 # Mention
 #########################################################
-X = "" #dummy
-working_subfolder = "mention_communities/"
+#X = "" #dummy
+#working_subfolder = "mention_communities/"
 # the communities we analyze (from the mention graph)
-spec_users = working_subfolder + "communitiesMent" + str(X) + ".txt"
+#spec_users = working_subfolder + "communitiesMent" + str(X) + ".txt"
 #########################################################
-
+# ALL
+#########################################################
+X = "" #dummy
+DIR_top_users = "ALL_users/" 
+working_subfolder = "ALL_users/"
+# the communities we analyze (from the mention graph)
+spec_users = working_subfolder + "ALL" + str(X) + ".txt"
+#########################################################
 f_in_article_IDs = "articles_selected"
 #
 # read in all article IDs
@@ -66,8 +68,6 @@ def read_article_IDs(): #TODO fin
 			cnt += 1
 
 	return article_IDs
-
-
 #
 # all the user ids (id map)
 #
@@ -205,6 +205,9 @@ def find_popular_concepts_user_list(lst_name, lst, user_CVs):
 	CV_sum = defaultdict(int)
 	aids = read_article_IDs()
 
+	if lst_name == "ALL":
+		lst = user_CVs.keys()
+
 	for usr in lst:
 		CV = user_CVs[usr]
 		if CV <> 0:
@@ -230,9 +233,29 @@ def plot_popular_concepts_user_list(data,fig_name, com_id):
 	y = np.array(data.values())
 	plt.loglog(x, y, label=com_id)
 	plt.grid(True)
-	plt.title("Top concepts in " + com_id + " : count")
+	plt.title("Concepts in " + com_id + ": sum score")
+	plt.ylabel('article sum score')
+	plt.xlabel('articles ordered by frequency')
 	plt.legend()
 	plt.savefig(fig_name,format='png',dpi=440)
+
+
+def extract_usr_num_CVs():
+
+	os.chdir(IN_DIR)
+	f = open("usr_num_CVs.tab", "w")
+
+	CV_sum = defaultdict(int)
+	user_CVs = read_all_user_CVs()
+
+	for usr in user_CVs:
+		CV = user_CVs[usr]
+		if CV <> 0:
+			cv = CV["CV"]
+			num_CVs = len(cv)
+			f.write(str(usr) +  '\t' + str(num_CVs) + '\n')
+
+	print "Saved usr num CVs in usr_num_CVs.tab"
 
 
 ###
@@ -261,21 +284,24 @@ def main():
 	for community in top_communities:
 		find_popular_concepts(community, top_communities[community], user_CVs)
 	#################################################################
-	
-
 ###
 ### call the others
 ###
-def main_user_list():
-
+def main_user_list(ALL):
 	os.chdir(IN_DIR)
-
 	user_CVs = read_all_user_CVs()
+	
+	if ALL == "ALL":
+		find_popular_concepts_user_list("ALL", None, user_CVs)
+		return
+
 	TOP_users_lists = read_TOP_users()
 
 	for top_list in TOP_users_lists:
 		find_popular_concepts_user_list(top_list, TOP_users_lists[top_list], user_CVs)
 
 #main()
+#main_user_list("ALL")
 
-main_user_list()
+# one time function call
+extract_usr_num_CVs()
