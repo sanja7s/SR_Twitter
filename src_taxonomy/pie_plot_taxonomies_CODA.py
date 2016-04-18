@@ -16,15 +16,16 @@ import matplotlib.pyplot as plt
 import sys
 
 
-ARG = "SR"
-#ARG = "mention"
+#ARG = "SR"
+ARG = "mention/CODA2"
 #ARG = "ment_SR"
 
 f_in = "tweets_taxonomy_clean.JSON"
 f_in_user_ids = "user_IDs.dat"
 IN_DIR = "../../../DATA/taxonomy_stats/"
 #spec_users = ARG + "/communitiesMent.txt"
-spec_users =  ARG + "/communitiesSR_0.2.txt"
+spec_users =  ARG + "/rescmtyvv.in.txt"
+#spec_users =  ARG + "/rescmtyvv.out.txt"
 #spec_users = ARG + "/communitiesMent_SR.txt"
 
 #TOP_GROUP = "reciprocal/"
@@ -85,13 +86,14 @@ def read_in_communities(sizeN=300):
 
 	f = open(spec_users, "r")
 
+	i = 0
 	for line in f:
-		line = line.split()
-		user_id = line[0]
-		com_id = line[1]
-		if com_id not in res:
-			res[com_id] = defaultdict(int)
-		res[com_id][user_id] = 1
+		com_id = i
+		res[com_id] = defaultdict(int)
+		users = line.split()
+		for user_id in users:
+			res[com_id][user_id] = 1
+		i += 1
 
 	for com in res:
 		if len(res[com]) >= sizeN:
@@ -354,8 +356,8 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 		if COM == 'ALL':
 			os.chdir('ALL/pie_plots')
 		else:
-			#os.chdir(ARG + '/pie_plots')
-			os.chdir(ARG + '/pie_plots_0.2')
+			os.chdir(ARG + '/pie_plots_in')
+			#os.chdir(ARG + '/pie_plots_0.2')
 		
 		#####################
 		##    KEYWORDS     ##
@@ -509,7 +511,7 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 		print
 
 
-		os.chdir("../../")
+		os.chdir("../../../")
 
 
 
@@ -824,8 +826,8 @@ def main(COM='ALL'):
 		sys.stdout = open('ALL/top_20_stats', 'w')
 		visualize_taxonomy_pies("ALL")
 	else:
-		sys.stdout = open(ARG + '/com_SR_0.2', 'w')
-		sizeN = 200
+		sys.stdout = open(ARG + '/com_CODA_stats_in', 'w')
+		sizeN = 500
 		top_communities, com_id_map, all_communities, all_com_id_map = read_in_communities(sizeN)
 		print len(top_communities), "top communities found of size ", str(sizeN)
 		NALL = len(all_communities)
