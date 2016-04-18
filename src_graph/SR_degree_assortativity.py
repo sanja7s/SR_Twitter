@@ -3,7 +3,7 @@
 '''
 	analyze assortativity of the graph in terms of degree only
 	also, go through different thresholds and find the map:
-	threshold -> degree_assortativity 
+	threshold -> degree_assortativity for two cases: weighted and unweighted SR
 '''
 from igraph import *
 import os
