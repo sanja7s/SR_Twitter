@@ -37,7 +37,7 @@ img_out_plot = "random_v2_threshold_graphs/da_rnd_v27s.png"
 f_in_graph_SR = "threshold_graphs/filter_IDs_SR_0.2"
 IN_DIR = "../../../DATA/SR_graphs/"
 f_out_plot_res = "threshold_graphs/plot_da_0.2_weighted.txt"
-img_out_plot = "threshold_graphs/da_weighted.png"
+img_out_plot = "threshold_graphs/da_weighted_7s.png"
 
 #########################
 
@@ -77,13 +77,13 @@ def degree_assortativity(G, threshold):
 def plot_DA(xaxis, da):
 	x = np.array(xaxis)
 	y = np.array(da)
-	plt.plot(x, y, 'g')
+	plt.plot(x, y, 'c')
 	plt.grid(True)
-	plt.title('Randomized SR network (no scaling)')
+	plt.title('SR network')
 	#plt.legend(bbox_to_anchor=(0, 1), bbox_transform=plt.gcf().transFigure)
 	plt.ylabel('degree assortativity')
 	plt.xlabel('SR threshold')
-	plt.savefig(img_out_plot,format='png',dpi=440)
+	plt.savefig(img_out_plot,format='png',dpi=700)
 
 
 def main():
@@ -94,7 +94,7 @@ def main():
 	G = read_in_SR_graph()
 
 	f = open(f_out_plot_res, "w")
-	for threshold in np.arange(0.2, 1, 0.01):
+	for threshold in np.arange(0.2, 0.9, 0.01):
 		s = degree_assortativity(G, threshold)
 		da.append(s)
 		xaxis.append(threshold)
