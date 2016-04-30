@@ -7,6 +7,7 @@ from collections import defaultdict
 import codecs
 import os
 import json
+import numpy as np
 
 IN_DIR = "../../../DATA/General/"
 os.chdir(IN_DIR)
@@ -115,6 +116,135 @@ def extract_edge_formation_and_deletion_SR():
 		(TOT_SR_BEFORE/cnt, TOT_SR_FORMATION/cnt, TOT_SR_MID/cnt, \
 			TOT_SR_DELETION/cnt, TOT_SR_AFTER/cnt)
 
+def extract_edge_formation_and_deletion_SR_with_STDEV():
+
+	edges_MOs = defaultdict(int)
+	monthly_SR = read_in_all_monthly_SR()
+
+	output_file = open(F_OUT, 'w')
+
+	cnt = 0
+
+	TOT_SR_BEFORE = []
+	TOT_SR_FORMATION = []
+	TOT_SR_MID = []
+	TOT_SR_DELETION = []
+	TOT_SR_AFTER = []
+
+	with codecs.open(F_IN,'r', encoding='utf8') as input_file:
+		for line in input_file:
+			(userA, userB, MO_formation, MO_deletion) = line.split()
+			MO_formation = int(MO_formation)
+			if MO_formation == 4 or MO_formation >= 10:
+				continue			
+			MO_deletion = int(MO_deletion)
+			if MO_deletion <= 6 or MO_deletion >= 10:
+				continue
+
+			cnt += 1
+			userA = int(userA)
+			userB = int(userB)
+			if userA < userB:
+				u1 = userA
+				u2 = userB
+			else:
+				u1 = userB
+				u2 = userA
+
+			SR_before = 0
+			SR_formation = 0
+			SR_mid = 0
+			SR_deletion = 0
+			SR_after = 0
+
+			i = 1
+			N = 7
+			MO = MONTHS[i]
+			while int(MO) < MO_formation:
+				SR_before += monthly_SR[(u1, u2)][str(MO)]
+				i += 1
+				MO = MONTHS[i]
+
+			SR_formation = monthly_SR[(u1, u2)][str(MO_formation)]
+
+			#i += 1
+			while i < MO_deletion-5+1:
+				MO = MONTHS[i]
+				SR_mid += monthly_SR[(u1, u2)][str(MO)]
+				i += 1
+
+			SR_deletion = monthly_SR[(u1, u2)][str(MO_deletion)]
+
+			"""
+			if MO_formation == MO_deletion:
+				assert i - 1 == MO_deletion - 5
+				SR_mid += SR_formation
+				assert SR_formation == SR_deletion
+			"""
+
+			i += 1
+			while i < 6:
+				MO = MONTHS[i]
+				SR_after += monthly_SR[(u1, u2)][str(MO)]
+				i += 1
+
+			months_before = float(int(MO_formation) - 2 - 4)
+			SR_before = SR_before / months_before if months_before > 0 else 0
+
+			months_mid = float(int(MO_deletion) - int(MO_formation) + 1)
+			SR_mid = SR_mid / months_mid 
+
+			months_after = float(12 - int(MO_deletion) - 2)
+			SR_after = SR_after / months_after if months_after > 0 else 0
+
+			#print months_before, months_mid, months_after
+			assert months_before + months_after + months_mid == 5
+
+			TOT_SR_BEFORE.append(SR_before)
+			TOT_SR_FORMATION.append(SR_formation)
+			TOT_SR_MID.append(SR_mid)
+			TOT_SR_DELETION.append(SR_deletion)
+			TOT_SR_AFTER.append(SR_after)
+
+
+
+			
+			#output_file.write(str(u1) + '\t' + str(u2) + '\t' + str(MO_formation) + '\t' + \
+			#	str(SR_before)+ '\t' + str(SR_formation)+ '\t' + str(SR_mid) + '\t' + \
+			#	str(SR_deletion)+ '\t' + str(SR_after) + '\n')
+
+	TOT_SR_BEFORE = np.array(TOT_SR_BEFORE)
+	TOT_SR_FORMATION = np.array(TOT_SR_FORMATION)
+	TOT_SR_MID =  np.array(TOT_SR_MID)
+	TOT_SR_DELETION = np.array(TOT_SR_DELETION)
+	TOT_SR_AFTER = np.array(TOT_SR_AFTER)
+
+	avg_bef = np.mean(TOT_SR_BEFORE)
+
+	avg_form = np.mean(TOT_SR_FORMATION)
+
+	avg_mid = np.mean(TOT_SR_MID)
+
+	avg_del = np.mean(TOT_SR_DELETION)
+
+	avg_aft = np.mean(TOT_SR_AFTER)
+
+	stdev_bef = np.std(TOT_SR_BEFORE)
+
+	stdev_form = np.std(TOT_SR_FORMATION)
+
+	stdev_mid = np.std(TOT_SR_MID)
+
+	stdev_del = np.std(TOT_SR_DELETION)
+
+	stdev_aft = np.std(TOT_SR_AFTER)
+
+
+	print "processed %d edges " % cnt
+	cnt = float(cnt)
+	print "Average SR, stdev before %f, %f, at the time %f, %f of formation, in the middle %f, %f, at deletion %f, %f and after %f, %f edges formation " % \
+		(avg_bef, stdev_bef, avg_form, stdev_form, avg_mid, stdev_mid, avg_del, stdev_del, avg_aft, stdev_aft)
+
 def read_in_all_monthly_SR():
 
 	monthly_SR = defaultdict(dict)
@@ -144,7 +274,7 @@ def read_in_all_monthly_SR():
 	return monthly_SR
 
 
-extract_edge_formation_and_deletion_SR()
+extract_edge_formation_and_deletion_SR_with_STDEV()
 	
 
 
