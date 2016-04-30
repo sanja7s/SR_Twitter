@@ -70,9 +70,11 @@ ax.set_xticks(np.arange(S.shape[1])+0.5, minor=False)
 
 # want a more natural, table-like display
 #ax.invert_yaxis()
-ax.xaxis.tick_top()
+ax.xaxis.tick_bottom()
 
-ax.yaxis.tick_right()
+ax.yaxis.tick_left()
+
+ax.set_title('Likelihood of mention edges in the SR graph')
 
 # Set the labels
 xlabels = [str(x) for x in  [0.2, 0.4, 0.6, 0.8, 0.9]]
@@ -101,8 +103,8 @@ for t in ax.yaxis.get_major_ticks():
     t.tick1On = False 
     t.tick2On = False  
 
-#vbar = fig.colorbar(heatmap, ax=ax, extend='max', ticks=[0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
-#vbar.ax.set_yticklabels([str(x) for x in [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]])
+vbar = fig.colorbar(heatmap, ax=ax, ticks=[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+vbar.ax.set_yticklabels([str(x) for x in [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]])
 
 #plt.show()
-plt.savefig("/home/sscepano/Projects7s/Twitter-workspace/DATA/General/SR_on_MENT/edges_vs_random.png", dpi=700)
+plt.savefig("/home/sscepano/Projects7s/Twitter-workspace/DATA/General/SR_on_MENT/edges_vs_random.eps", dpi=700)
