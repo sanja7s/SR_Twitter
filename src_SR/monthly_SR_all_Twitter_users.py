@@ -13,7 +13,7 @@ from multiprocessing import Process, Manager
 from multiprocessing.managers import BaseManager, DictProxy
 import os, codecs
 
-MO = "11"
+MO = "7"
 
 # where we work
 IN_DIR = "../../../DATA/General/"

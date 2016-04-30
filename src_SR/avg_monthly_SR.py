@@ -7,6 +7,7 @@ from collections import defaultdict
 import codecs
 import os
 import json
+import numpy as np
 
 IN_DIR = "../../../DATA/General/"
 os.chdir(IN_DIR)
@@ -55,28 +56,52 @@ def read_in_all_monthly_SR():
 def calculate_monthly_avg_SR_no_self_loops():
 	monthly_SR = read_in_all_monthly_SR()
 
-	avg_May = 0
-	avg_June = 0
-	avg_July = 0
-	avg_Aug = 0
-	avg_Sept = 0
-	avg_Oct = 0
-	avg_Nov = 0
+	avg_May = []
+	avg_June = []
+	avg_July = []
+	avg_Aug = []
+	avg_Sept = []
+	avg_Oct = []
+	avg_Nov = []
 
 	cnt_edge = 0.0
 
 	for edge in monthly_SR:
-		avg_May += monthly_SR[edge]["5"]
-		avg_June += monthly_SR[edge]["6"]
-		avg_July += monthly_SR[edge]["7"]
-		avg_Aug += monthly_SR[edge]["8"]
-		avg_Sept += monthly_SR[edge]["9"]
-		avg_Oct += monthly_SR[edge]["10"]
-		avg_Nov += monthly_SR[edge]["11"]
+		avg_May.append(monthly_SR[edge]["5"])
+		avg_June.append(monthly_SR[edge]["6"])
+		avg_July.append(monthly_SR[edge]["7"])
+		avg_Aug.append(monthly_SR[edge]["8"])
+		avg_Sept.append(monthly_SR[edge]["9"])
+		avg_Oct.append(monthly_SR[edge]["10"])
+		avg_Nov.append(monthly_SR[edge]["11"])
 		cnt_edge += 1
 
-	print "Average edge SR (no self loops) is %f %f %f %f %f %f %f" % \
-		(avg_May/cnt_edge, avg_June/cnt_edge, avg_July/cnt_edge, avg_Aug/cnt_edge, avg_Sept/cnt_edge, avg_Oct/cnt_edge, avg_Nov/cnt_edge)
+	avg_May = np.array(avg_May)
+	avg_June = np.array(avg_June)
+	avg_July = np.array(avg_July)
+	avg_Aug = np.array(avg_Aug)
+	avg_Sept = np.array(avg_Sept)
+	avg_Oct = np.array(avg_Oct)
+	avg_Nov = np.array(avg_Nov)
+
+	avgM = np.mean(avg_May)
+	avgJ = np.mean(avg_June)
+	avgJ2 = np.mean(avg_July)
+	avgA = np.mean(avg_Aug)
+	avgS = np.mean(avg_Sept)
+	avgO = np.mean(avg_Oct)
+	avgN = np.mean(avg_Nov)
+
+	stdevM = np.std(avg_May)
+	stdevJ = np.std(avg_June)
+	stdevJ2 = np.std(avg_July)
+	stdevA = np.std(avg_Aug)
+	stdevS = np.std(avg_Sept)
+	stdevO = np.std(avg_Oct)
+	stdevN = np.std(avg_Nov)
+
+	print '%f, %f, %f, %f, %f, %f, %f' % (avgM, avgJ, avgJ2, avgA, avgS, avgO, avgN)
+	print '%f, %f, %f, %f, %f, %f, %f' % (stdevM, stdevJ, stdevJ2, stdevA, stdevS, stdevO, stdevN)
 
 calculate_monthly_avg_SR_no_self_loops()
 	
