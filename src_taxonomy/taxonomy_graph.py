@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+"""
+    Given the taxonomy output from AlchemyAPI, for each level of taxonomies, extract the graph
+    so that the taxons in this level are connected based on the number of users sharing these taxons 
+    in their tweets
+"""
 
 import codecs
 from collections import defaultdict, OrderedDict
