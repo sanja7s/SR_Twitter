@@ -48,6 +48,8 @@ def give_tree_layout(t):
 	#ts.arc_start = -180
 	#ts.arc_span = 180
 	#ts.scale = 100
+	ts.min_leaf_separation = 10
+	ts.show_scale = False
 
 	return ts
 
@@ -316,4 +318,4 @@ if __name__ == "__main__":
 		check_tree(t)
 		ts = give_tree_layout(t)
 		#t.show(tree_style=ts)
-		t.render(SAVE_IN + str(community) + "_COM_bubble_map.png", w=3440, dpi=650, tree_style=ts)
+		t.render(SAVE_IN + str(community) + "_COM_bubble_map.png", w=1200, dpi=440, tree_style=ts)

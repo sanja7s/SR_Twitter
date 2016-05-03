@@ -13,17 +13,18 @@ import glob, os
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 import sys
 
 
-ARG = "SR"
-#ARG = "mention"
+#ARG = "SR"
+ARG = "mention"
 #ARG = "ment_SR"
 
 f_in = "tweets_taxonomy_clean.JSON"
 f_in_user_ids = "user_IDs.dat"
 IN_DIR = "../../../DATA/taxonomy_stats/"
-#spec_users = ARG + "/communitiesMent.txt"
+spec_users = ARG + "/communitiesMent.txt"
 #spec_users =  ARG + "/communitiesSR_0.2.txt"
 #spec_users = ARG + "/communitiesMent_SR.txt"
 
@@ -32,7 +33,7 @@ IN_DIR = "../../../DATA/taxonomy_stats/"
 #DIR_top_users = "TOP_users/" + str(TOP_GROUP)
 #PREFIX = "100_top_"
 
-DIR_single_users = "pie_plots"
+#DIR_single_users = "pie_plots"
 
 ##################################################
 # read in a map for the twitter username --> id
@@ -264,6 +265,8 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 
 			for el in entities:
 				entity = el["text"]
+				if entity == 'Twitter' or entity  == 'twitter':
+					continue
 				# if we first time encounter this entity, add a dict for it in the result
 				if not entity in entities_sum:
 					entities_sum[entity] = defaultdict(int)
@@ -276,6 +279,8 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 
 			for el in concepts:
 				concept = el["text"]
+				if concept == 'Trigraph' or concept  == 'Gh':
+					continue
 				# if we first time encounter this concept, add a dict for it in the result
 				if not concept in concepts_sum:
 					concepts_sum[concept] = defaultdict(int)
@@ -357,7 +362,8 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 			os.chdir('ALL/pie_plots')
 		else:
 			#os.chdir(ARG + '/pie_plots')
-			os.chdir(ARG + '/pie_plots_0.2')
+			#os.chdir(ARG + '/pie_plots_0.2')
+			os.chdir(ARG + '/pie_plots_PRETTY')
 		
 		#####################
 		##    KEYWORDS     ##
@@ -1048,17 +1054,26 @@ def visualize_taxonomy_pies_single_user(user_ids, COM, user_list=None, TOP_N=20)
 		os.chdir("../")
 
 def plot_pie(labels, sizes, f_pie_name):
-	#colors = ['yellowgreen', 'mediumpurple', 'lightskyblue', 'lightcoral'] 
+	colors = ['yellowgreen', 'mediumpurple', 'lightskyblue', 'lightcoral', 'paleturquoise',
+			'navy', 'mistyrose', 'mediumspringgreen', 'mediumaquamarine', 'limegreen',
+			'gray', 'lavenderblush', 'lightgoldenrodyellow',  'lightgreen', 'lightsalmon' ] 
+	ax = plt.subplot( 111 ) 
+	print labels
+	print sizes
 	#explode = np.zeros(sizes.shape[0])    # proportion with which to offset each wedge
-	plt.pie(sizes,              # data
+	ax.pie(sizes,              # data
 			#explode=explode,    # offset parameters 
 			labels=labels,      # slice labels
-			#colors=colors,      # array of colours
+			colors=colors,      # array of colours
 			autopct='%1.1f%%',  # print the values inside the wedges
 			shadow=True,        # enable shadow
 			startangle=70       # starting angle
 			)
 	#plt.axis('equal')
+	wedges = [patch for patch in ax.patches if isinstance(patch, matplotlib.patches.Wedge)]
+	for w in wedges:
+		w.set_linewidth( 2 )
+		w.set_edgecolor( 'cyan' )
 	plt.savefig(f_pie_name)
 
 def main_TOP_users():
@@ -1087,13 +1102,13 @@ def main(COM='ALL'):
 		visualize_taxonomy_pies("ALL")
 	else:
 		sys.stdout = open(ARG + '/com_SR_0.2', 'w')
-		sizeN = 200
+		sizeN = 300
 		top_communities, com_id_map, all_communities, all_com_id_map = read_in_communities(sizeN)
 		print len(top_communities), "top communities found of size ", str(sizeN)
 		NALL = len(all_communities)
 		print NALL, "all communities found"
 		for community in top_communities:
-			visualize_taxonomy_pies(str(community), user_list=top_communities[community], TOP_N=20, user_com=all_com_id_map, N_COM=NALL)
+			visualize_taxonomy_pies(str(community), user_list=top_communities[community], TOP_N=15, user_com=all_com_id_map, N_COM=NALL)
 
 # other possible argument is 'COM' or any other string to print pies for the communities
 # 'ALL' prints the pie stats for the whole dataset
@@ -1108,7 +1123,7 @@ def main(COM='ALL'):
 
 
 ###############################################################################
-#main('COM')
+main('COM')
 
 # runme as
 # python pie_plot_taxonomies.py > "/home/sscepano/Projects7s/Twitter-workspace/DATA/taxonomy_stats/SR/pie_plots_0.6/com_20_stats.txt"
@@ -1122,9 +1137,11 @@ def main(COM='ALL'):
 #main_TOP_users()
 ###############################################################################
 
-users = [1345,	  26125, 6035,	12406, 13952,	19631, 24923,	26301, 10907, \
-		27318, 21405,	10725, 19966,	330, 15810,	22078, 14156,	23485, 890,	21148, 7513,	14191]
+#users = [1345,	  26125, 6035,	12406, 13952,	19631, 24923,	26301, 10907, \
+#		27318, 21405,	10725, 19966,	330, 15810,	22078, 14156,	23485, 890,	21148, 7513,	14191]
 
-os.chdir(IN_DIR)
-for user in users:
-	main_SINGLE_users(user)
+#users = [1345]
+
+#os.chdir(IN_DIR)
+#for user in users:
+#	main_SINGLE_users(user)
