@@ -43,7 +43,8 @@ def read_in_edges_sent(f2, threshold = 0):
 		uid2 = int(uid2)
 		w = int(w)
 		if w > threshold:
-			if sent_dat[uid1] != 0 and sent_dat[uid2] != 0 and uid1 != uid2:
+			#if sent_dat[uid1] != 0 and sent_dat[uid2] != 0 and uid1 != uid2:
+			if uid1 != uid2:
 				edges_sent.append((sent_dat[uid1], sent_dat[uid2]))
 				for i in range(w):
 					edges_sent_weighted.append((sent_dat[uid1], sent_dat[uid2]))
@@ -166,31 +167,31 @@ def plot_heatmap(heatmap, extent, fig_name, colmap=cm.PuOr):
 def scatterplot_edges_sent_hist2d_recip(edges_sent, edges_sent_weighted):
 
 	heatmap, extent = get_heatmap(edges_sent)
-	fig_name = "recip_th10.png"
+	fig_name = "recip_neutral.png"
 	plot_heatmap(heatmap, extent, fig_name, colmap=cm.coolwarm)
 
 	heatmap_w, extent_w = get_heatmap(edges_sent_weighted)
-	fig_name_w = "recip_weighted_th10.png"
+	fig_name_w = "recip_weighted_neutral.png"
 	plot_heatmap(heatmap_w, extent_w, fig_name_w, colmap=cm.coolwarm)
 
-	heatmap_diff = np.subtract(heatmap_w, heatmap)
-	fig_name_diff = "recip_diff_th10.png"
-	plot_heatmap(heatmap_diff, extent_w, fig_name_diff, colmap=cm.coolwarm)	
+	#heatmap_diff = np.subtract(heatmap_w, heatmap)
+	#fig_name_diff = "recip_diff_th10.png"
+	#plot_heatmap(heatmap_diff, extent_w, fig_name_diff, colmap=cm.coolwarm)	
 
 
 def scatterplot_edges_sent_hist2d_dir(edges_sent, edges_sent_weighted):
 
 	heatmap, extent = get_heatmap(edges_sent)
-	fig_name = "dir_log_th10.png"
+	fig_name = "dir_neutral.png"
 	plot_heatmap(heatmap, extent, fig_name)
 
 	heatmap_w, extent_w = get_heatmap(edges_sent_weighted)
-	fig_name_w = "dir_weighted_log_th10.png"
+	fig_name_w = "dir_weighted_neutral.png"
 	plot_heatmap(heatmap_w, extent_w, fig_name_w)
 
-	heatmap_diff = np.subtract(heatmap_w, heatmap)
-	fig_name_diff = "dir_diff_log_th10.png"
-	plot_heatmap(heatmap_diff, extent_w, fig_name_diff)
+	#heatmap_diff = np.subtract(heatmap_w, heatmap)
+	#fig_name_diff = "dir_diff_neutral.png"
+	#plot_heatmap(heatmap_diff, extent_w, fig_name_diff)
 
 def scatterplot_edges_sent_hist2d_diff(edges_sent_dir, edges_sent_weighted_dir, edges_sent_rec, edges_sent_weighted_rec):
 
@@ -230,16 +231,16 @@ def main_pdf():
 def main_scatter_directed():
 	os.chdir(IN_DIR)
 	f = open(f_weighted_edges_in, 'r')
-	edges_sent, edges_sent_weighted = read_in_edges_sent(f, 10)
+	edges_sent, edges_sent_weighted = read_in_edges_sent(f, 0)
 	scatterplot_edges_sent_hist2d_dir(edges_sent, edges_sent_weighted) 
 #main_scatter_directed()
 
 def main_scatter_reciprocal():
 	os.chdir(IN_DIR)
 	f = open(f_recip_weighted_edges_in, 'r')
-	edges_sent, edges_sent_weighted = read_in_edges_sent(f, 10)
+	edges_sent, edges_sent_weighted = read_in_edges_sent(f, 0)
 	scatterplot_edges_sent_hist2d_recip(edges_sent, edges_sent_weighted) 
-#main_scatter_reciprocal()
+main_scatter_reciprocal()
 
 def main_scatter_diff():
 	os.chdir(IN_DIR)
@@ -258,5 +259,4 @@ def main_scatter_diff_v2():
 	f = open(f_weighted_edges_in, 'r')
 	edges_sent, edges_sent_weighted = read_in_one_side_edges_sent(f, 0)
 	scatterplot_edges_sent_diff_v2(edges_sent, edges_sent_weighted) 
-
-main_scatter_diff_v2()
+#main_scatter_diff_v2()
