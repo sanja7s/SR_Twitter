@@ -43,3 +43,6 @@ else:
 print("The relative branching is: " + str(P21))
 print("The intermodular connectivity is: " + str(P32))
 print("The transitivity is: " + str(C))
+"""
+	awk 'if $3 > threshold {print $1, $2}' SR_0x > SRUNW
+"""
