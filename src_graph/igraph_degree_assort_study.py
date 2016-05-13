@@ -68,14 +68,14 @@ def study_assort(net, threshold):
 	print("The intermodular connectivity is: " + str(P32))
 	print("The transitivity is: " + str(C))
 
-	return P21, P32, C
+	return P21, P32, C, DA
 
 # Read the network in form of edge list, weighted and undirected
 #net=nx.read_edgelist(sys.argv[1], nodetype=int)
 net = read_in_SR_graph()
 summary(net)
 
-f = open('Deg_assort_study.tab', "w")
+f = open('Deg_assort_study_MO6.tab', "w")
 for threshold in np.arange(0, 0.9, 0.01):
-	P21, P32, C = study_assort(net, threshold)
-	f.write(str(threshold) + '\t'+ str(P21) + '\t' + str(P32) + '\t' + str(C) + '\n')
+	P21, P32, C, DA = study_assort(net, threshold)
+	f.write(str(threshold) + '\t'+ str(P21) + '\t' + str(P32) + '\t' + str(C) + '\t' + str(DA) + '\n')

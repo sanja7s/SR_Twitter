@@ -8,46 +8,16 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 #########################
-#X = "0.2"
-"""
-#for RANDOM v1
-f_in_graph_SR = "random_v1_threshold_graphs/rnd_SR_" + str(X) #+ "_1K"
-IN_DIR = "../../../DATA/SR_graphs/"
-f_out_plot_res = "random_v1_threshold_graphs/plot_da_rnd_v1_0.2.txt"
-img_out_plot = "random_v1_threshold_graphs/da_rnd_v1.png"
-"""
-"""
-#for RANDOM v2
-f_in_graph_SR = "random_v2_threshold_graphs/" + str(X) + "_rnd2_SR"
-IN_DIR = "../../../DATA/SR_graphs/"
-f_out_plot_res = "random_v2_threshold_graphs/plot_da_rnd_v2_0.2.txt"
-img_out_plot = "random_v2_threshold_graphs/da_rnd_v2.png"
-"""
-"""
-#for RANDOM v27s (v22)
-f_in_graph_SR = "random_v2_threshold_graphs/" + str(X) + "_rnd27s_SR"
-IN_DIR = "../../../DATA/SR_graphs/"
-f_out_plot_res = "random_v2_threshold_graphs/plot_da_rnd_v27s_0.2.txt"
-img_out_plot = "random_v2_threshold_graphs/da_rnd_v27s.png"
-"""
-
-"""
-# for ORIGINAL
-f_in_graph_SR = "threshold_graphs/filter_IDs_SR_0.2"
-IN_DIR = "../../../DATA/SR_graphs/"
-f_out_plot_res = "threshold_graphs/plot_da_0.2_weighted.txt"
-img_out_plot = "threshold_graphs/da_weighted_7s.png"
-"""
 
 IN_DIR = '/home/sscepano/Projects7s/Twitter-workspace/ALL_SR'
-img_out_plot = "da_unweighted.png"
+img_out_plot = "6MOda_unweighted.png"
 #########################
 
 #########################
 # read from a file the res
 #########################
 def read_in_res():
-	f = open('Deg_assort_study.weighted_edge_list', 'r')
+	f = open('6MODeg_assort_study.weighted_edge_list', 'r')
 
 	DA = []
 	TH = []
