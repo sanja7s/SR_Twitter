@@ -38,7 +38,9 @@ def extract_edge_formation_SR():
 			MO_formation = int(MO_formation)
 			if MO_formation == 4 or MO_formation >= 10:
 				continue
-
+			# remove or no
+			if MO_deletion >= 6 and MO_deletion <= 10:
+				continue
 			cnt += 1
 
 			userA = int(userA)
@@ -185,7 +187,9 @@ def extract_edge_formation_SR_with_STDEV():
 
 			if MO_formation == 4 or MO_formation >= 10:
 				continue
-
+			# remove or no
+			if MO_deletion >= 6 and MO_deletion <= 10:
+				continue
 			cnt += 1
 
 			userA = int(userA)

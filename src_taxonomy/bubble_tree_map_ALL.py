@@ -125,16 +125,16 @@ IN_DIR = "../../../DATA/taxonomy_stats"
 
 def read_user_IDs():
 
-    user_ids = defaultdict(str)
+	user_ids = defaultdict(str)
 
-    with codecs.open(f_in_user_ids,'r', encoding='utf8') as f:
-        for line in f:
-            line = line.split()
-            user_id = line[0]
-            user =  line[1]
-            user_ids[user] = user_id
+	with codecs.open(f_in_user_ids,'r', encoding='utf8') as f:
+		for line in f:
+			line = line.split()
+			user_id = line[0]
+			user =  line[1]
+			user_ids[user] = user_id
 
-    return user_ids
+	return user_ids
 
 ###
 # 
@@ -192,7 +192,7 @@ def read_in_data():
 	#T = Tree(S, format=8)
 	T = Tree(S, format=1)
 
-  	return T
+	return T
 
 
 def prune_tree(t, threshold=100.0):
@@ -200,22 +200,22 @@ def prune_tree(t, threshold=100.0):
 	to_delete_nodes = []
 
 	for node in t.iter_descendants():
-  		# delete too small nodes
-  		if float(node.dist) < threshold:
-  			to_delete_nodes.append(node)
-  			node.delete(prevent_nondicotomic=False,preserve_branch_length=False)
+		# delete too small nodes
+		if float(node.dist) < threshold:
+			to_delete_nodes.append(node)
+			node.delete(prevent_nondicotomic=False,preserve_branch_length=False)
 
 def check_tree(t):
 
 	for node in t.traverse():
 		if node.name == "sex":
-  			print node.name, node.dist
-  		if node.name == "movies":
-  			print node.name, node.dist
-  		if node.name == "crime":
-  			print node.name, node.dist
-  		if "entertainment" in node.name:
-  			print node.name, node.dist
+			print node.name, node.dist
+		if node.name == "movies":
+			print node.name, node.dist
+		if node.name == "crime":
+			print node.name, node.dist
+		if "entertainment" in node.name:
+			print node.name, node.dist
 
 if __name__ == "__main__":
 
@@ -230,4 +230,8 @@ if __name__ == "__main__":
 	check_tree(t)
 	ts = give_tree_layout(t)
 	t.show(tree_style=ts)
-	t.render("bubble_map.png", w=3440, dpi=730, tree_style=ts)
+	#t.render("bubble_map.png", w=3440, dpi=730, tree_style=ts)
+
+	os.system("rm test.svg 2> /dev/null")
+	t.render( "bubble_map7s2.svg", w=1024, dpi=200, tree_style=ts)
+	os.system("convert -trim -depth 32 -background transparent %s.svg %s.eps" %("bubble_map7s2", "bubble_map7s2"))

@@ -16,6 +16,13 @@ import matplotlib.pyplot as plt
 import matplotlib
 import sys
 
+font = {'family' : 'sans-serif',
+		'variant' : 'normal',
+		'weight' : 'light',
+		'size'   : 14}
+
+matplotlib.rc('font', **font)
+
 
 #ARG = "SR"
 ARG = "mention"
@@ -397,9 +404,9 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 			i += 1
 			if i == TOP_N:
 				break
-		plot_pie(labels, sizes, "kw_tfid_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plot_pie(labels, sizes, "kw_tfid_com_" + str(COM) + "_top_" + str(TOP_N) + ".eps")
 		plt.clf()
-		plot_pie(labels, sizes_tot, "kw_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plot_pie(labels, sizes_tot, "kw_com_" + str(COM) + "_top_" + str(TOP_N) + ".eps")
 		plt.clf()
 		print
 
@@ -435,9 +442,9 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 			i += 1
 			if i == TOP_N:
 				break
-		plot_pie(labels, sizes, "ent_tfidf_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plot_pie(labels, sizes, "ent_tfidf_com_" + str(COM) + "_top_" + str(TOP_N) + ".eps")
 		plt.clf()
-		plot_pie(labels, sizes_tot, "ent_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plot_pie(labels, sizes_tot, "ent_com_" + str(COM) + "_top_" + str(TOP_N) + ".eps")
 		plt.clf()
 		print
 
@@ -472,9 +479,9 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 			i += 1
 			if i == TOP_N:
 				break
-		plot_pie(labels, sizes, "concept_tfidf_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plot_pie(labels, sizes, "concept_tfidf_com_" + str(COM) + "_top_" + str(TOP_N) + ".eps")
 		plt.clf()
-		plot_pie(labels, sizes_tot, "concept_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plot_pie(labels, sizes_tot, "concept_com_" + str(COM) + "_top_" + str(TOP_N) + ".eps")
 		plt.clf()
 		print
 
@@ -510,9 +517,9 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 			i += 1
 			if i == TOP_N:
 				break
-		plot_pie(labels, sizes, "taxon_tfidf_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plot_pie(labels, sizes, "taxon_tfidf_com_" + str(COM) + "_top_" + str(TOP_N) + ".eps")
 		plt.clf()
-		plot_pie(labels, sizes_tot, "taxon_com_" + str(COM) + "_top_" + str(TOP_N) + ".png")
+		plot_pie(labels, sizes_tot, "taxon_com_" + str(COM) + "_top_" + str(TOP_N) + ".eps")
 		plt.clf()
 		print
 
@@ -699,9 +706,9 @@ def visualize_taxonomy_pies_user_list(user_ids, COM, user_list=None, TOP_N=20):
 			i += 1
 			if i == TOP_N:
 				break
-		#plot_pie(labels, sizes, "kw_tfid_com_" + str(COM) + ".png")
+		#plot_pie(labels, sizes, "kw_tfid_com_" + str(COM) + ".eps")
 		#plt.clf()
-		plot_pie(labels, sizes_tot, "kw_com_" + str(COM) + ".png")
+		plot_pie(labels, sizes_tot, "kw_com_" + str(COM) + ".eps")
 		plt.clf()
 		print
 
@@ -730,9 +737,9 @@ def visualize_taxonomy_pies_user_list(user_ids, COM, user_list=None, TOP_N=20):
 			i += 1
 			if i == TOP_N:
 				break
-		#plot_pie(labels, sizes, "ent_tfidf_com_" + str(COM) +  ".png")
+		#plot_pie(labels, sizes, "ent_tfidf_com_" + str(COM) +  ".eps")
 		#plt.clf()
-		plot_pie(labels, sizes_tot, "ent_com_" + str(COM) + ".png")
+		plot_pie(labels, sizes_tot, "ent_com_" + str(COM) + ".eps")
 		plt.clf()
 		print
 
@@ -760,9 +767,9 @@ def visualize_taxonomy_pies_user_list(user_ids, COM, user_list=None, TOP_N=20):
 			i += 1
 			if i == TOP_N:
 				break
-		#plot_pie(labels, sizes, "concept_tfidf_" + str(COM) + ".png")
+		#plot_pie(labels, sizes, "concept_tfidf_" + str(COM) + ".eps")
 		#plt.clf()
-		plot_pie(labels, sizes_tot, "concept_" + str(COM) + ".png")
+		plot_pie(labels, sizes_tot, "concept_" + str(COM) + ".eps")
 		plt.clf()
 		print
 
@@ -791,9 +798,9 @@ def visualize_taxonomy_pies_user_list(user_ids, COM, user_list=None, TOP_N=20):
 			i += 1
 			if i == TOP_N:
 				break
-		#plot_pie(labels, sizes, "taxon_tfidf_" + str(COM) + ".png")
+		#plot_pie(labels, sizes, "taxon_tfidf_" + str(COM) + ".eps")
 		#plt.clf()
-		plot_pie(labels, sizes_tot, "taxon_" + str(COM) + ".png")
+		plot_pie(labels, sizes_tot, "taxon_" + str(COM) + ".eps")
 		plt.clf()
 		print
 
@@ -964,7 +971,7 @@ def visualize_taxonomy_pies_single_user(user_ids, COM, user_list=None, TOP_N=20)
 			i += 1
 			if i == TOP_N:
 				break
-		#plot_pie(labels, sizes_tot, "kw_user_" + str(COM) + ".png")
+		#plot_pie(labels, sizes_tot, "kw_user_" + str(COM) + ".eps")
 		#plt.clf()
 		print
 
@@ -991,7 +998,7 @@ def visualize_taxonomy_pies_single_user(user_ids, COM, user_list=None, TOP_N=20)
 			i += 1
 			if i == TOP_N:
 				break
-		#plot_pie(labels, sizes_tot, "ent_user_" + str(COM) + ".png")
+		#plot_pie(labels, sizes_tot, "ent_user_" + str(COM) + ".eps")
 		#plt.clf()
 		print
 
@@ -1019,7 +1026,7 @@ def visualize_taxonomy_pies_single_user(user_ids, COM, user_list=None, TOP_N=20)
 			if i == TOP_N:
 				break
 
-		#plot_pie(labels, sizes_tot, "concept_" + str(COM) + ".png")
+		#plot_pie(labels, sizes_tot, "concept_" + str(COM) + ".eps")
 		#plt.clf()
 		print
 
@@ -1047,7 +1054,7 @@ def visualize_taxonomy_pies_single_user(user_ids, COM, user_list=None, TOP_N=20)
 			i += 1
 			if i == TOP_N:
 				break
-		#plot_pie(labels, sizes_tot, "taxon_" + str(COM) + ".png")
+		#plot_pie(labels, sizes_tot, "taxon_" + str(COM) + ".eps")
 		#plt.clf()
 		print
 

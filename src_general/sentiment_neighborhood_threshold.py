@@ -11,8 +11,8 @@ from igraph import *
 
 font = {'family' : 'monospace',
 		'variant' : 'normal',
-        'weight' : 'light',
-        'size'   : 7}
+		'weight' : 'light',
+		'size'   : 12}
 
 matplotlib.rc('font', **font)
 
@@ -96,14 +96,14 @@ def plot_SA(xaxis, sa, ne, img_out_plot):
 	# Make the y-axis label and tick labels match the line color.
 	ax1.set_ylabel('pairwise assortativity', color='c')
 	for tl in ax1.get_yticklabels():
-	    tl.set_color('c')
+		tl.set_color('c')
 
 	ax2 = ax1.twinx()
 	ax2.plot(x, y1, 'rd-')
 	ax2.set_ylabel('log(# edges)', color='r')
 	#ax2.set_yscale("log")
 	for tl in ax2.get_yticklabels():
-	    tl.set_color('r')
+		tl.set_color('r')
 
 	plt.grid(True)
 	plt.title('Sentiment pairwise assortativity')
@@ -176,14 +176,14 @@ def plot_SA_neighborhood(xaxis, sa, ne, img_out_plot):
 	# Make the y-axis label and tick labels match the line color.
 	ax1.set_ylabel('neighborhood assortativity', color='g')
 	for tl in ax1.get_yticklabels():
-	    tl.set_color('g')
+		tl.set_color('g')
 
 	ax2 = ax1.twinx()
 	ax2.plot(x, y1, 'md-')
 	ax2.set_ylabel('log(# edges)', color='m')
 	#ax2.set_yscale("log", nonposy='clip')
 	for tl in ax2.get_yticklabels():
-	    tl.set_color('m')
+		tl.set_color('m')
 
 	plt.grid(True)
 	plt.title('Sentiment neighborhood assortativity')
@@ -193,6 +193,11 @@ def plot_SA_neighborhood(xaxis, sa, ne, img_out_plot):
 #########################################################################
 
 def plot_SA_both(xaxis, sa, ne, nsa, nne, img_out_plot):
+
+	#from matplotlib.font_manager import FontProperties
+	#fontP = FontProperties()
+	#fontP.set_size('small')
+	#legend([plot1], "title", prop = fontP)
 	
 	x = np.array(xaxis)
 	y = np.array(sa)
@@ -202,27 +207,27 @@ def plot_SA_both(xaxis, sa, ne, nsa, nne, img_out_plot):
 	yn1 = np.log(np.array(nne))
 
 	fig, ax1 = plt.subplots()
-	ax1.plot(x, y, 'gp-', label='pairwise assortativity')
-	ax1.plot(x, yn, 'gd-', label='neighborhood assortativity')
-	ax1.set_xlabel('# mention threshold')
+	ax1.plot(x, y, 'gp-', label='pairwise')
+	ax1.plot(x, yn, 'gd-', label='neighborhood')
+	ax1.set_xlabel('# mentions threshold')
 	# Make the y-axis label and tick labels match the line color.
-	ax1.set_ylabel('assortativity', color='g')
+	ax1.set_ylabel('sentiment assortativity', color='g')
 	for tl in ax1.get_yticklabels():
-	    tl.set_color('g')
+		tl.set_color('g')
 
-	plt.legend()
+	plt.legend(loc='best',frameon=False)
 
 	ax2 = ax1.twinx()
-	ax2.plot(x, y1, 'mp-', label='# edges (pairwise)')
-	ax2.plot(x, yn1, 'md-', label='# edges (neighborhood)')
+	ax2.plot(x, y1, 'mp-', label='pairwise')
+	ax2.plot(x, yn1, 'md-', label='neighborhood')
 	ax2.set_ylabel('log(# edges)', color='m')
 	#ax2.set_yscale("log", nonposy='clip')
 	for tl in ax2.get_yticklabels():
-	    tl.set_color('m')
+		tl.set_color('m')
 
-	plt.legend(loc=2)
+	plt.legend(loc='best',frameon=False)
 	plt.grid(True)
-	plt.title('Sentiment parwise and neighborhood assortativity')
+	#plt.title('Sentiment parwise and neighborhood assortativity')
 	#plt.legend(bbox_to_anchor=(0, 1), bbox_transform=plt.gcf().transFigure)
 
 	plt.savefig('sentiment/both/' + img_out_plot,format='png',dpi=200)
@@ -248,6 +253,6 @@ def main():
 	G = read_in_recip()
 	nxaxis, nsa, nne = neighborhood_assortativity(G) 
 
-	plot_SA_both(xaxis, sa, ne, nsa, nne, 'sentimen_assortativity_v3.png')
+	plot_SA_both(xaxis, sa, ne, nsa, nne, 'sentimen_assortativity_v7.png')
 
 main()

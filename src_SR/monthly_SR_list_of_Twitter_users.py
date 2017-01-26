@@ -199,7 +199,6 @@ def print_topN_common_user_concepts(usrA, usrB, topN=100):
 		if i == topN:
 			break
 		
-
 # NB this function takes important elements away from the CV array
 def print_topN_user_concepts(usr, topN):
 	txt = USR_TWEETS.find_one({"_id": usr})['txt']
@@ -218,17 +217,11 @@ def print_topN_text_concepts(txt, topN):
 	for i in range (topN):
 		print_top_concept(v)
 
-
-def MO_extract_user_CV(user, MO):
-	
+def MO_extract_user_CV(user, MO):	
 	vec = defaultdict(int)
-
 	MO7s = MONTHS[MO]
-
 	#print MO7s, user
-
 	cv = MO7s.find_one({"_id": user})
-
 	if cv == None:
 		return None, 0
 	v = cv['CV']
@@ -242,9 +235,7 @@ def MO_extract_user_CV(user, MO):
 			vec[key] = float(value)
 	return OrderedDict(sorted(vec.items(), key=lambda x: x[1], reverse= False)), num_tweets
 
-
 def MO_SR_2_users(usrA, usrB, MO):
-
 	CVA, num_tweetsA = MO_extract_user_CV(usrA, MO)
 	CVB, num_tweetsB = MO_extract_user_CV(usrB, MO)
 	if num_tweetsA <> 0 and num_tweetsB <> 0:
@@ -254,18 +245,14 @@ def MO_SR_2_users(usrA, usrB, MO):
 	return 0, num_tweetsA, num_tweetsB
 
 def read_in_mention_edge_list_undir():
-
 	mention_edge_list_undir = defaultdict(int)
 	mention_edges = "mention_graph_weights.dat"
 	f = open(mention_edges, 'r')
-
 	for line in f:
 		(userA_id, userB_id, weight) = line.split()
 		if (userA_id, userB_id) not in mention_edge_list_undir and (userB_id, userA_id) not in mention_edge_list_undir:
 			mention_edge_list_undir[(userA_id, userB_id)] = 1
-
 	print "Read %d undirected edges from mention graph " % len(mention_edge_list_undir)
-
 	return mention_edge_list_undir
 
 

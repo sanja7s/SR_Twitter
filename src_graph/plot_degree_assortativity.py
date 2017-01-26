@@ -10,14 +10,14 @@ import matplotlib.pyplot as plt
 #########################
 
 IN_DIR = '/home/sscepano/Projects7s/Twitter-workspace/ALL_SR'
-img_out_plot = "6MOda_unweighted.png"
+img_out_plot = "7MOda_unweighted.png"
 #########################
 
 #########################
 # read from a file the res
 #########################
 def read_in_res():
-	f = open('6MODeg_assort_study.weighted_edge_list', 'r')
+	f = open('7MODeg_assort_study.weighted_edge_list', 'r')
 
 	DA = []
 	TH = []

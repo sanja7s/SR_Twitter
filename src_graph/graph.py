@@ -8,9 +8,11 @@ import time
 import matplotlib.dates as mdates
 from datetime import datetime as d
 from scipy.stats.stats import pearsonr, spearmanr
+import os
 
 #import stats_about_tweet_data as stat
 
+os.chdir('../../../DATA/')
 WORKING_FOLDER = "filter_more_20_tweets/"
 
 f_in = WORKING_FOLDER + "tweets_with_usrs_with_more_than_20_tweets.dat"
@@ -281,3 +283,5 @@ explore_SR_of_interaction_direction()
 # interaction vs. SR
 #################################
 #interaction_vs_SR(10)
+
+interaction_vs_SR()

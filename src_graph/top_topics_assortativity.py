@@ -27,9 +27,50 @@ f_in_user_topics = "user_score_for_top_topics.tab"
 #f_out_SR = "sentiment_assortativity_SR"  + str(X) + ".txt"
 #########################
 
+def jackknife_dir(G, r, att):
+	ri = []
+	G1 = G.copy()
+	print len(G.es)
+	i = 0
+	for e in G.es:
+		G1.delete_edges((e.source, e.target))
+
+		r1 = G1.assortativity(att,directed=True)
+
+		ri.append(r1)
+		#if i%1000==0:
+		#	print i, r1
+		i += 1
+
+		G1.add_edge(e.source, e.target)
+	s = 0.0
+	for r1 in ri:
+		s += (r1-r)*(r1-r)
+	return math.sqrt(s)
+
+def jackknife_undir(G, r, att):
+	ri = []
+	G1 = G.copy()
+	print len(G.es)
+	i = 0
+	for e in G.es:
+		G1.delete_edges((e.source, e.target))
+
+		r1 = G1.assortativity(att,directed=False)
+
+		ri.append(r1)
+		#if i%1000==0:
+		#	print i, r1
+		i += 1
+
+		G1.add_edge(e.source, e.target)
+	s = 0.0
+	for r1 in ri:
+		s += (r1-r)*(r1-r)
+	return math.sqrt(s)
 
 def mention_igraph_assortativity():
-	sys.stdout = open(f_out_ment, 'w')
+	#sys.stdout = open(f_out_ment, 'w')
 	G = Graph.Read_Ncol(f_in_graph_weights,names=True, directed=True, weights=True)
 	summary(G)
 
@@ -54,12 +95,36 @@ def mention_igraph_assortativity():
 	G.delete_vertices(to_delete_vertices)
 	summary(G)
 
+	"""
 	for att in ["music", "movies", "sex", "humor", "school"]:
+		print
 		print att
-		print  "label assortativity is %f " %  (G.assortativity(types1=att,types2=att,directed=True))
-		print "label assortativity is %f " %  (G.assortativity(att,directed=True))
-		print 
+		#print  "label assortativity is %f " %  (G.assortativity(types1=att,types2=att,directed=True))
+		#print "label assortativity is %f " %  (G.assortativity(att,directed=True))
+		 
 
+		r = G.assortativity(att,directed=True)
+		s = jackknife_dir(G, r, att)
+		print att + " DIR assortativity is %f and st. dev. is %f " % (r, s)
+
+	"""
+	###########################################
+
+	G.to_undirected(mode='mutual')
+
+	not_connected_nodes = G.vs(_degree_eq=0)
+
+	to_delete_vertices = not_connected_nodes
+	print len(to_delete_vertices)
+	G.delete_vertices(to_delete_vertices)
+	summary(G)
+
+	for att in ["music", "movies", "sex", "humor", "school"]:
+		print
+		print att
+		r = G.assortativity(att,directed=False)
+		s = jackknife_undir(G, r, att)
+		print att + " MUTUAL assortativity is %f and st. sign. is %f " % (r, s)
 
 def mention_igraph_assortativity_randomize():
 	sys.stdout = open(f_out_ment_rand, 'w')
@@ -102,7 +167,8 @@ def mention_igraph_assortativity_randomize():
 def main():
 
 	os.chdir(IN_DIR)
-	#mention_igraph_assortativity()
-	mention_igraph_assortativity_randomize()
+	print 'START'
+	mention_igraph_assortativity()
+	#mention_igraph_assortativity_randomize()
 
 main()

@@ -318,4 +318,4 @@ if __name__ == "__main__":
 		check_tree(t)
 		ts = give_tree_layout(t)
 		#t.show(tree_style=ts)
-		t.render(SAVE_IN + str(community) + "_COM_bubble_map.png", w=1200, dpi=440, tree_style=ts)
+		t.render(SAVE_IN + str(community) + "_COM_bubble_map.eps", w=1200, dpi=440, tree_style=ts)

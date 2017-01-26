@@ -29,6 +29,47 @@ IN_DIR_SR = "../../../DATA/SR_graphs/"
 f_out_SR = "sentiment_assortativity_SR"  + str(X) + ".txt"
 #########################
 
+def jackknife_dir(G, r):
+	ri = []
+	G1 = G.copy()
+	print len(G.es)
+	i = 0
+	for e in G.es:
+		G1.delete_edges((e.source, e.target))
+
+		r1 = G1.assortativity("sent_val",directed=True)
+
+		ri.append(r1)
+		if i%1000==0:
+			print i, r1
+		i += 1
+
+		G1.add_edge(e.source, e.target)
+	s = 0.0
+	for r1 in ri:
+		s += (r1-r)*(r1-r)
+	return math.sqrt(s)
+
+def jackknife_undir(G, r):
+	ri = []
+	G1 = G.copy()
+	print len(G.es)
+	i = 0
+	for e in G.es:
+		G1.delete_edges((e.source, e.target))
+
+		r1 = G1.assortativity("sent_val",directed=False)
+
+		ri.append(r1)
+		if i%1000==0:
+			print i, r1
+		i += 1
+
+		G1.add_edge(e.source, e.target)
+	s = 0.0
+	for r1 in ri:
+		s += (r1-r)*(r1-r)
+	return math.sqrt(s)
 
 def mention_igraph_assortativity():
 	os.chdir(IN_DIR)
@@ -57,6 +98,7 @@ def mention_igraph_assortativity():
 	G.delete_vertices(to_delete_vertices)
 	summary(G)
 
+	"""
 	print "Sentiment (by label) nominal assortativity is %f " %  (G.assortativity_nominal(types="sent_nominal",directed=True))
 	print "Sentiment (by label) assortativity is %f " %  (G.assortativity("sent",directed=True))
 	#print "Sentiment (by label) assortativity is %f " %  (G.assortativity(types1="sent",types2="sent",directed=True))
@@ -64,6 +106,32 @@ def mention_igraph_assortativity():
 	#print "Sentiment (by value) assortativity is %f " %  (G.assortativity_nominal(types="sent_val",directed=True))
 	print "Sentiment (by value) assortativity is %f " %  (G.assortativity("sent_val",directed=True))
 	#print "Sentiment (by value) assortativity is %f " %  (G.assortativity(types1="sent_val",types2="sent_val",directed=True))
+
+	r = G.assortativity("sent_val",directed=True)
+	s = jackknife_dir(G, r)
+	print "Sentiment (by value) assortativity is %f and st. sign. is %f " % (r, s)
+
+	"""
+	G.to_undirected(mode='mutual')
+
+	not_connected_nodes = G.vs(_degree_eq=0)
+
+	to_delete_vertices = not_connected_nodes
+	print len(to_delete_vertices)
+	G.delete_vertices(to_delete_vertices)
+	summary(G)
+
+	#print "UNDIR Reciprocal Sentiment (by label) nominal assortativity is %f " %  (G.assortativity_nominal(types="sent_nominal",directed=False))
+	#print "UNDIR Reciprocal Sentiment (by label) assortativity is %f " %  (G.assortativity("sent",directed=False))
+	#print "Sentiment (by label) assortativity is %f " %  (G.assortativity(types1="sent",types2="sent",directed=True))
+
+	#print "Sentiment (by value) assortativity is %f " %  (G.assortativity_nominal(types="sent_val",directed=True))
+	print "UNDIR Reciprocal Sentiment (by value) assortativity is %f " %  (G.assortativity("sent_val",directed=False))
+	#print "Sentiment (by value) assortativity is %f " %  (G.assortativity(types1="sent_val",types2="sent_val",directed=True))
+
+	r = G.assortativity("sent_val",directed=False)
+	s = jackknife_undir(G, r)
+	print "Sentiment (by value) assortativity in MUTUAL undir is %f and st. sign. is %f " % (r, s)
 
 def mention_nx_assortativity():
 	os.chdir(IN_DIR)
@@ -232,6 +300,7 @@ def SR_nx_assortativity():
 
 #mention_nx_assortativity()
 #mention_igraph_assortativity()
+mention_igraph_assortativity()
 
 #SR_igraph_assortativity()
-SR_nx_assortativity()
+#SR_nx_assortativity()

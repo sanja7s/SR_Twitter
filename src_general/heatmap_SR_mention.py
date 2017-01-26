@@ -46,9 +46,13 @@ S = np.matrix(
 )
 
 
+
 # Normalize data columns
 #S = (nba - nba.mean()) / (nba.max() - nba.min())
 # Plot it out
+
+S = S/42.98
+
 fig, ax = plt.subplots()
 #heatmap = ax.pcolor(np.array(S), cmap=plt.cm.Greens, alpha=0.99)
 heatmap = ax.pcolor(np.array(S), cmap=plt.cm.Greens, norm=colors.LogNorm(vmin=S.min(), vmax=S.max()))
@@ -59,7 +63,7 @@ print S.min(), S.max()
 ## FORMAT ##
 ##################################################
 fig = plt.gcf()
-fig.set_size_inches(8,11)
+fig.set_size_inches(8,8)
 
 # turn off the frame
 ax.set_frame_on(False)
@@ -74,15 +78,15 @@ ax.xaxis.tick_bottom()
 
 ax.yaxis.tick_left()
 
-ax.set_title('Likelihood of mention edges in the SR graph')
+#ax.set_title('Likelihood of mention edges in the SR graph',size = 16)
 
 # Set the labels
 xlabels = [str(x) for x in  [0.2, 0.4, 0.6, 0.8, 0.9]]
 ylabels = [str(x) for x in  [1,5,10,15,20,30,50,100]]
 
 # note I could have used nba_sort.columns but made "labels" instead
-ax.set_xticklabels(xlabels, minor=False) 
-ax.set_yticklabels(ylabels, minor=False)
+ax.set_xticklabels(xlabels, minor=False, size=16) 
+ax.set_yticklabels(ylabels, minor=False, size=16)
 
 
 # rotate the 
@@ -90,8 +94,8 @@ plt.xticks(rotation=90)
 
 ax.grid(False)
 
-plt.xlabel('SR threshold')
-plt.ylabel('# of mentions')
+plt.xlabel('SR threshold', size=16)
+plt.ylabel('communication intensity threshold', size=16)
 
 # Turn off all the ticks
 ax = plt.gca()
@@ -103,8 +107,8 @@ for t in ax.yaxis.get_major_ticks():
     t.tick1On = False 
     t.tick2On = False  
 
-vbar = fig.colorbar(heatmap, ax=ax, ticks=[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
-vbar.ax.set_yticklabels([str(x) for x in [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]])
+vbar = fig.colorbar(heatmap, ax=ax, ticks=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+vbar.ax.set_yticklabels([str(x) for x in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]], size=16)
 
 #plt.show()
-plt.savefig("/home/sscepano/Projects7s/Twitter-workspace/DATA/General/SR_on_MENT/edges_vs_random.eps", dpi=700)
+plt.savefig("/home/sscepano/Projects7s/Twitter-workspace/DATA/General/SR_on_MENT/7sedges_vs_random7.eps", dpi=700)
