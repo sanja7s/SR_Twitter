@@ -81,8 +81,8 @@ def read_in_communities(sizeN=300):
 	res7s = defaultdict(int)
 	res3 = defaultdict(int)
 	res3 = defaultdict(lambda: -1, res3)
-	res4 = defaultdict(int)
-	res4 = defaultdict(lambda: -1, res4)
+	#res4 = defaultdict(int)
+	#res4 = defaultdict(lambda: -1, res4)
 
 	f = open(spec_users, "r")
 
@@ -98,8 +98,8 @@ def read_in_communities(sizeN=300):
 	for com in res:
 		if len(res[com]) >= sizeN:
 			res7s[com] = res[com]
-			for usr in res[com]:
-				res4[usr] = com
+		for usr in res[com]:
+			res4[usr] = com
 
 	for com in res7s:
 		for usr in res7s[com]:
@@ -147,6 +147,7 @@ def community_IDFs(user_com):
 			
 			for el in keywords:
 				category = el["text"]
+				category = category.lower()
 				# if we first time encounter this keyword, add a list for it in the result
 				if not category in keywords_sum:
 					keywords_sum[category] = []
@@ -155,6 +156,9 @@ def community_IDFs(user_com):
 
 			for el in entities:
 				entity = el["text"]
+				if entity in ['#', '#MentionTo', 'twitter', 'Twitter']:
+					continue
+				entity = entity.lower()
 				# if we first time encounter this entity, add a list for it in the result
 				if not entity in entities_sum:
 					entities_sum[entity] = []
@@ -163,6 +167,7 @@ def community_IDFs(user_com):
 
 			for el in concepts:
 				concept = el["text"]
+				concept = conc.lower()
 				# if we first time encounter this concept, add a list for it in the result
 				if not concept in concepts_sum:
 					concepts_sum[concept] = []
@@ -252,6 +257,7 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 			
 			for el in keywords:
 				category = el["text"]
+				category = category.lower()
 				# if we first time encounter this keyword, add a dict for it in the result
 				if not category in keywords_sum:
 					keywords_sum[category] = defaultdict(int)
@@ -264,6 +270,9 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 
 			for el in entities:
 				entity = el["text"]
+				if entity in ['#', '#MentionTo', 'twitter', 'Twitter']:
+					continue
+				entity = entity.lower()
 				# if we first time encounter this entity, add a dict for it in the result
 				if not entity in entities_sum:
 					entities_sum[entity] = defaultdict(int)
@@ -276,6 +285,7 @@ def visualize_taxonomy_pies(COM="ALL", user_list=None, TOP_N=10, user_com=None, 
 
 			for el in concepts:
 				concept = el["text"]
+				concept = concept.lower()
 				# if we first time encounter this concept, add a dict for it in the result
 				if not concept in concepts_sum:
 					concepts_sum[concept] = defaultdict(int)
