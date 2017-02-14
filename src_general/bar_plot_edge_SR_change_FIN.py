@@ -32,10 +32,10 @@ def plot_bars_with_stdev_MO(SRmeans, SRStd):
 
 
 	# add some text for labels, title and axes ticks
-	ax.set_ylabel('Avg SR')
+	#ax.set_ylabel('Avg SR')
 	ax.set_title('Whole network')
 	ax.set_xticks(ind + width)
-	ax.set_xticklabels(('June', 'July', 'August', 'Sept', 'Oct', 'Nov'))
+	ax.set_xticklabels(('Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov'))
 
 	ax.set_ylim([-0.1, 0.35])
 	ax.set_yticks((-0.1,0.1,0.3))
@@ -99,7 +99,7 @@ def plot_bars_with_stdev_1(DeletionMeans, DeletionStd):
 
 
 	# add some text for labels, title and axes ticks
-	ax.set_ylabel('Avg SR')
+	#ax.set_ylabel('Avg SR')
 	ax.set_title('Interaction activation')
 	ax.set_xticks(ind + width)
 	ax.set_xticklabels(('Before', 'At activation', 'After'))
@@ -133,7 +133,7 @@ def plot_bars_with_stdev_7(formationDeletionMeans, formationDeletionStd):
 
 	ax.set_ylim([-0.1, 0.35])
 	# add some text for labels, title and axes ticks
-	ax.set_ylabel('Avg SR')
+	#ax.set_ylabel('Avg SR')
 	ax.set_title('SR change on the interaction')
 	ax.set_xticks(ind + width)
 	ax.set_xticklabels(('Before', 'At activation', 'In the Mid', 'At decomission', 'After'))
@@ -234,10 +234,10 @@ def plot_bars_with_stdev_MO_2(SRmeans, SRStd):
 
 
 	# add some text for labels, title and axes ticks
-	ax.set_ylabel('Avg SR')
+	#ax.set_ylabel('Avg SR')
 	ax.set_title('Persisting interactions')
 	ax.set_xticks(ind + width)
-	ax.set_xticklabels(('June', 'July', 'August', 'Sept', 'Oct', 'Nov'))
+	ax.set_xticklabels(('Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov'))
 
 	ax.set_ylim([-0.1, 0.35])
 	ax.set_yticks((-0.1,0.1,0.3))

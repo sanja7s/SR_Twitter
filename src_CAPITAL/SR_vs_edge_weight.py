@@ -13,20 +13,13 @@ import os
 import matplotlib.cm as cm
 from collections import defaultdict
 import matplotlib
-
+from scipy import stats
 import seaborn as sns
-sns.set(color_codes=True)
 
-sns.set(font_scale=2) 
 
+sns.set(style="white", color_codes=True, font_scale=2)
 from scipy.stats.stats import pearsonr
 
-font = {'family' : 'sans-serif',
-		'variant' : 'normal',
-		'weight' : 'light',
-		'size'   : 20}
-
-matplotlib.rc('font', **font)
 
 f_in_user_labels = "usr_num_CVs.tab"
 ##################
@@ -70,7 +63,6 @@ def read_in_edge_weight_SR(file_name= 'undirected_mention_graph_with_SR_weight.d
 		s[float(ew)] = float(eSR)
 	return s
 
-
 def read_in_edge_weight_inconsistency(file_name= 'weight_inconsistency_on_edge_float.dat'):
 	f = open(file_name, 'r')
 	s = defaultdict(float)
@@ -81,34 +73,45 @@ def read_in_edge_weight_inconsistency(file_name= 'weight_inconsistency_on_edge_f
 
 def plot_edge_weight_vs_SR():
 	s = read_in_edge_weight_SR()
-
 	w = []
 	inc = []
-	
 	for el in s:
 		# weight
 		w.append(el)
 		# inconsistency
 		einc = s[el]
 		inc.append(einc)
-
 	w=np.array(w)
 	inc=np.array(inc)
 	print np.corrcoef(w,inc)
-
 	print pearsonr(w, inc)
 
-	ylabel = 'communication intensity'
-	xlabel = 'edge SR'
-
+	plt.grid(0)
+	ylabel = '$CI(e)$'
+	xlabel = '$SR(e)$'
 	plt.clf()
-	with sns.axes_style("white"):
-		g = sns.jointplot(x=inc, y=w, kind="scatter", color="yellow", xlim=(-0.07,1.07)).set_axis_labels(xlabel, ylabel)
-
-	#plt.tight_layout()
+	plt.grid(0)
+	fig7s = plt.gcf()
 	
-	#plt.grid(True)
+	#plt.figure(figsize=(8, 8))
+	plt.rcParams['figure.figsize']=((6,6))
+	"""
+	fig7s = plt.gcf()
+	print "Before size inches:", fig7s.get_size_inches()
+	fig7s = plt.gcf()
+	fig7s.set_size_inches((8,8))
+	fig7s = plt.gcf()
+	print "After size inches:", fig7s.get_size_inches()
+	"""
+
+	g = sns.jointplot(x=inc, y=w, kind="scatter", annot_kws=dict(stat="r"),\
+	 color="gold", xlim=(-0.07,1.07), ylim=(-20,2200)).set_axis_labels(xlabel, ylabel)
 	plt.savefig( 'undir_edge_weight_vs_SR_scatter.eps', dpi=500, bbox_inches='tight')
+
+	fig_size = plt.rcParams["figure.figsize"]
+	print "Current size:", fig_size
+	fig7s = plt.gcf()
+	print "Current size inches:", fig7s.get_size_inches()
 
 
 """
@@ -123,4 +126,4 @@ def corr_edge_incon_SR():
 	inc=np.array(inc)
 	print np.corrcoef(SR,inc)
 
-#plot_edge_weight_vs_SR()
+plot_edge_weight_vs_SR()

@@ -15,17 +15,8 @@ from collections import defaultdict
 import matplotlib
 from scipy.stats.stats import pearsonr
 
-font = {'family' : 'sans-serif',
-		'variant' : 'normal',
-		'weight' : 'light',
-		'size'   : 20}
-
-matplotlib.rc('font', **font)
-
 import seaborn as sns
-sns.set(color_codes=True)
-
-sns.set(font_scale=2) 
+sns.set(color_codes=True, font_scale=2) 
 
 f_in_user_labels = "usr_num_CVs.tab"
 ##################
@@ -449,22 +440,22 @@ def plot_capitals(cap, coef_soc, coef_sem, name_soc='degree', name_sem='CVs'):
 
 def plot_capitals_seaborn(x, y, name_soc='degree', name_sem='CVs'):
 
-	xlabel = 'social capital: popularity'
+	xlabel = 'social capital: activity'
 	ylabel = 'semantic capital: ' + name_sem
 
 	labels = [r'$ 10^0 $', r'$ 10^0 $', r'$ 10^1 $', r'$ 10^2 $', r'$ 10^3 $', r'$ 10^4 $', r'$ 10^5 $', r'$ 10^6 $', r'$ 10^7 $', r'$ 10^8 $']
 	#labels = ['s','d','g','s','d','g','s','d','g']
-	with sns.axes_style("white"):
-		g = sns.jointplot(x=np.log(x+1), y=y, kind="hex", color="darkorchid").set_axis_labels(xlabel, ylabel)
+	sns.set_style("white")
+	g = sns.jointplot(x=np.log(x+1), y=y, kind="hex", annot_kws=dict(stat="r"), color="darkred").set_axis_labels(xlabel, ylabel)
 
 	#g.set(xticklabels=labels)
 	g.ax_joint.set_xticklabels(labels)
 	#plt.tight_layout()
 
-	plt.savefig(name_sem + name_soc + '7.eps', bbox_inches='tight', dpi=550)
+	plt.savefig(name_sem + name_soc + '77.eps', bbox_inches='tight', dpi=550)
 
-soc='weighted indegree'
-social_capital_vs_sem(soc=soc,sem='CVs')
+soc='weighted outdegree'
+social_capital_vs_sem(soc=soc,sem='entities')
 #social_capital_vs_sem(soc=soc,sem='entities')
 #social_capital_vs_sem(soc=soc,sem='concepts')
 

@@ -15,19 +15,11 @@ from collections import defaultdict
 import matplotlib
 
 import seaborn as sns
-sns.set(color_codes=True)
-
-sns.set(font_scale=2) 
+sns.set(color_codes=True, font_scale=2) 
+sns.set_style('whitegrid')
 
 import pandas as pd
 from scipy import stats, integrate
-
-font = {'family' : 'sans-serif',
-		'variant' : 'normal',
-		'weight' : 'light',
-		'size'   : 16}
-
-matplotlib.rc('font', **font)
 
 f_in_user_labels = "usr_num_CVs.tab"
 ##################
@@ -66,7 +58,9 @@ def social_capital_distributions(f_name, tname):
 		cap.append(val)
 		cnt += 1
 	print cnt
-	plot_cap_distr_CVs(cap, tname)
+	#plot_cap_distr_CVs(cap, tname)
+	plot_cap_distr_entities(cap, 'entities')
+	#plot_cap_distr_CVs(cap, 'CVs')
 
 def social_capital_distributions_1(f_name, tname):
 	f = open(f_name, "r")
@@ -208,13 +202,18 @@ def plot_cap_distr_entities(z, tname):
 	lab = '$\mu=' +  "{:.3f}".format(mu) \
 	 + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$'
 
-	sns.distplot(z, bins=30, \
-		hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
+	fig7s = plt.gcf()
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s.set_size_inches((6,6))
+	plt.figure(figsize=(6, 6))
+
+	sns.distplot(z, bins=30, hist=0, \
+		#hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
 		color="r")
 	plt.title(lab)
 
 	plt.xlabel('entity diversity')
-	plt.ylabel('kde(entity diversity)')
+	plt.ylabel('kde')
 	plt.xlim(-1,31)
 	plt.tight_layout()
 
@@ -226,22 +225,27 @@ def plot_cap_distr_CVs(z, tname):
 	mu = np.mean(z)
 	sigma = np.std(z)
 
+	fig7s = plt.gcf()
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s.set_size_inches((6,6))
+	plt.figure(figsize=(6, 6))
+
 	lab = '$\mu=' +  "{:.3f}".format(mu) \
 	 + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$'
 
 	sns.distplot(z, \
-		hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
-		color="r")
+		#hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
+		color="r", hist=0)
 	plt.title(lab)
 
-	plt.xlabel('CVs diversity')
-	plt.ylabel('kde(CVs diversity)')
+	plt.xlabel('CV concept diversity')
+	plt.ylabel('kde')
 	plt.xlim(0,2000)
 	plt.tight_layout()
 
-	plt.savefig(tname + '_v7.eps')
+	plt.savefig(tname + '_v77.eps')
 
 
-social_capital_distributions('CVs', 'Cvs')
+#social_capital_distributions('entities', 'entities')
 
-#social_capital_distributions('node_scalar_inconsistency_v2', 'status inconsistency')
+social_capital_distributions('node_scalar_inconsistency_v2', 'status inconsistency')

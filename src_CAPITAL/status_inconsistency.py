@@ -15,18 +15,10 @@ from collections import defaultdict
 import matplotlib
 
 import seaborn as sns
-sns.set(color_codes=True)
-
-sns.set(font_scale=2) 
+sns.set(color_codes=True, font_scale=2) 
 
 from scipy.stats.stats import pearsonr
 
-font = {'family' : 'sans-serif',
-		'variant' : 'normal',
-		'weight' : 'light',
-		'size'   : 20}
-
-matplotlib.rc('font', **font)
 
 f_in_user_labels = "usr_num_CVs.tab"
 ##################
@@ -376,17 +368,21 @@ def plot_edge_weight_vs_inconsistency(fn):
 
 	print pearsonr(w, inc)
 
-	ylabel = 'communication intensity'
-	xlabel = 'edge inconsistency'
+	ylabel = '$CI(e)$'
+	xlabel = '$st_{inc}(e)$'
 
 	plt.clf()
-	with sns.axes_style("white"):
-		g = sns.jointplot(x=inc, y=w, kind="scatter", color="green", xlim=(-1.07,1.07)).set_axis_labels(xlabel, ylabel)
+	fig7s = plt.gcf()
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s.set_size_inches((6,6))
+	plt.figure(figsize=(6, 6))
+	sns.set_style("white")
+	g = sns.jointplot(x=inc, y=w, kind="scatter", annot_kws=dict(stat="r"), color="green", xlim=(-1.07,1.07)).set_axis_labels(xlabel, ylabel)
 
 	#plt.tight_layout()
 	
 	#plt.grid(True)
-	plt.savefig( 'dir_edge_weight_vs_incon_float7s22scatter.eps', dpi=500, bbox_inches='tight')
+	plt.savefig('dir_edge_weight_vs_incon_float7s22scatter7.eps', dpi=500, bbox_inches='tight')
 
 def plot_edge_sc_vs_pop_diff_2(diff, tname):
 	coef_soc = 100

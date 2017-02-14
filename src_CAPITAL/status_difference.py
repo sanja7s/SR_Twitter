@@ -16,17 +16,8 @@ import matplotlib
 
 from scipy.stats.stats import pearsonr
 
-font = {'family' : 'sans-serif',
-		'variant' : 'normal',
-		'weight' : 'light',
-		'size'   : 20}
-
-matplotlib.rc('font', **font)
-
 import seaborn as sns
-sns.set(color_codes=True)
-
-sns.set(font_scale=2) 
+sns.set(color_codes=True, font_scale=2) 
 
 f_in_user_labels = "usr_num_CVs.tab"
 ##################
@@ -176,19 +167,28 @@ def plot_edge_popularity_diff_distr_seaborn(x, tname):
 	 + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$'
 
 	xlabel = 'relative social status'
-	ylabel = 'kde(relative social status)'
+	ylabel = 'kde'
+
+	fig7s = plt.gcf()
+	plt.rcParams['figure.figsize']=(8,6)
+	fig7s.set_size_inches((8,6))
+	plt.figure(figsize=(8, 6))
 
 	print max(x)
 	z = [xel if xel == 0 else np.log10(abs(xel))*np.sign(xel) for xel in x]
 	print max(z)
 	z = np.array(z)
 
-	g = sns.distplot(z, \
-		hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
-		color="r")
+	with sns.axes_style("whitegrid"):
+		"""
+		g = sns.distplot(z, hist=0, \
+			#hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
+			color="r")
+		"""
+		g = sns.kdeplot(z, kernel='cos', c='r')
 	plt.title(lab)
-	labels = [r'$ 10^{-4} $', r'$ 10^{-3} $', r'$ 10^{-2} $', \
-	r'$ 10^{-1} $', r'$ 10^0 $', r'$ 10^1 $', r'$ 10^2 $', \
+	labels = [r'$ -10^{4} $', r'$ -10^{3} $', r'$ -10^{2} $', \
+	r'$ -10^{1} $', r'$ 0 $', r'$ 10^1 $', r'$ 10^2 $', \
 	r'$ 10^3 $', r'$ 10^4 $']
 	g.set(xticklabels=labels)
 
@@ -229,31 +229,36 @@ def plot_edge_semantic_capital_diff_distr_seaborn(x, tname):
 	mu = np.mean(x)
 	sigma = np.std(x)
 
+	fig7s = plt.gcf()
+	plt.rcParams['figure.figsize']=(8,6)
+	fig7s.set_size_inches((8,6))
+	plt.figure(figsize=(8, 6))
+
 	lab = '$\mu=' +  "{:.3f}".format(mu) \
 	 + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$'
 
 	xlabel = 'relative semantic status'
-	ylabel = 'kde(relative semantic status)'
+	ylabel = 'kde'
 
 	print max(x)
 	z = [xel if xel == 0 else np.log10(abs(xel))*np.sign(xel) for xel in x]
 	print max(z)
 	z = np.array(x)
 
-	g = sns.distplot(z, \
-		hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
-		color="r")
+	with sns.axes_style("whitegrid"):
+		"""
+		g = sns.distplot(z, hist=0, \
+			#hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
+			color="r")
+		"""
+		g = sns.kdeplot(z, kernel='cos', c='r')
 	plt.title(lab)
-	labels = [r'$ 10^{-4} $', r'$ 10^{-3} $', r'$ 10^{-2} $', \
-	r'$ 10^{-1} $', r'$ 10^0 $', r'$ 10^1 $', r'$ 10^2 $', \
-	r'$ 10^3 $', r'$ 10^4 $']
-	#g.set(xticklabels=labels)
 
 	plt.xlabel(xlabel)
 	plt.ylabel(ylabel)
 
 	plt.tight_layout()	
-	plt.savefig(tname + 'weighted7.eps', bbox_inches='tight', dpi=550)
+	plt.savefig(tname + 'weighted77.eps', bbox_inches='tight', dpi=550)
 
 def plot_edge_popularity_distr_2(x, tname):
 
@@ -402,11 +407,11 @@ def plot_edge_sc_vs_pop_diff_2_seaborn(diff, tname):
 #pop_diff = read_edge_popularity_diff('edge_src_dest_weighted_INdeg.dat')	
 #plot_edge_popularity_diff_distr_seaborn(pop_diff, 'popularity diff (source - receiver)')
 
-#sc_diff = read_edge_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
-#plot_edge_semantic_capital_diff_distr_seaborn(sc_diff,'sem cap diff (source - receiver)')
+sc_diff = read_edge_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
+plot_edge_semantic_capital_diff_distr_seaborn(sc_diff,'sem cap diff (source - receiver)')
 
 #pop_sc_diff = read_edge_popularity_and_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
 #plot_edge_sc_vs_pop_diff_2(pop_sc_diff, 'pop vs. sem cap status diff')
 
-pop_sc_diff = read_edge_popularity_and_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
-plot_edge_sc_vs_pop_diff_2_seaborn(pop_sc_diff, 'pop vs. sem cap status diff')
+#pop_sc_diff = read_edge_popularity_and_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
+#plot_edge_sc_vs_pop_diff_2_seaborn(pop_sc_diff, 'pop vs. sem cap status diff')

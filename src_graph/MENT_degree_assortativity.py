@@ -12,12 +12,8 @@ import matplotlib.pyplot as plt
 import matplotlib
 import math
 
-font = {'family' : 'sans-serif',
-		'variant' : 'normal',
-		'weight' : 'light',
-		'size'   : 14}
-
-matplotlib.rc('font', **font)
+import seaborn as sns
+sns.set(color_codes=True, font_scale=2) 
 
 #########################
 # for original mention graph
@@ -35,14 +31,14 @@ f_out_plot_res = "threshold_mention_graphs/plot_da_conv.txt"
 img_out_plot = "threshold_mention_graphs/da_weighted_conv.png"
 #img_out_plot_rnd = "threshold_mention_graphs/da_weighted_rnd.png"
 #########################
-img_out_plot_UNDIR_W_all = "threshold_mention_graphs/da_weighted_undir_all_3007.eps"
-img_out_plot_UNDIR_W_mutual = "threshold_mention_graphs/da_weighted_undir_mutual_3007.eps"
-img_out_plot_UNDIR = "threshold_mention_graphs/da_weighted_UNDIR_3007.eps"
-img_out_plot_DEFAULT = "threshold_mention_graphs/da_weighted_DEFAULT_3007s.eps"
-img_out_plot_IN_OUT = "threshold_mention_graphs/da_weighted_IN_OUT_3007s.eps"
-img_out_plot_IN_IN = "threshold_mention_graphs/da_weighted_IN_IN_3007s.eps"
-img_out_plot_OUT_IN = "threshold_mention_graphs/da_weighted_OUT_IN_3007s.eps"
-img_out_plot_OUT_OUT = "threshold_mention_graphs/da_weighted_OUT_OUT_3007s.eps"
+img_out_plot_UNDIR_W_all = "threshold_mention_graphs/da_weighted_undir_all_300777.eps"
+img_out_plot_UNDIR_W_mutual = "threshold_mention_graphs/da_weighted_undir_mutual_300777.eps"
+img_out_plot_UNDIR = "threshold_mention_graphs/da_weighted_UNDIR_300777.eps"
+img_out_plot_DEFAULT = "threshold_mention_graphs/da_weighted_DEFAULT_300777s.eps"
+img_out_plot_IN_OUT = "threshold_mention_graphs/da_weighted_IN_OUT_300777s.eps"
+img_out_plot_IN_IN = "threshold_mention_graphs/da_weighted_IN_IN_300777s.eps"
+img_out_plot_OUT_IN = "threshold_mention_graphs/da_weighted_OUT_IN_300777s.eps"
+img_out_plot_OUT_OUT = "threshold_mention_graphs/da_weighted_OUT_OUT_300777s.eps"
 #########################
 # read from a file that is an edge list with weights
 #########################
@@ -355,25 +351,30 @@ def plot_DA(xaxis, da, img_out, lab="", col ="g"):
 	x = np.array(xaxis)
 	y = np.array(da)
 	fig = plt.gcf()
-	fig.set_size_inches(8.3,6.5)
+	fig.set_size_inches(8,8)
+	sns.set_style("white")
 	plt.plot(x, y, col, label=lab, hold=True)
 	plt.grid(False)
 	#plt.title('Convolution mention with SR network')
 	plt.ylabel('weighted degree assortativity')
-	plt.xlabel('min communication intensity (# of mentions)')
+	plt.xlabel('$CI_{th}$')
 	#leg = plt.legend(bbox_to_anchor=(0.152, 1.152),frameon=True)
+	plt.ylim((-0.05,1.05))
 	# Place a legend above this legend, expanding itself to
 	# fully use the given bounding box.
-	leg = plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-           ncol=2, mode="expand", borderaxespad=0.)
+	#leg = plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+    #       ncol=2, mode="expand", borderaxespad=0.)
+
 	#leg.get_frame().set_linewidth(0.0)
 	#leg.get_frame().set_edgecolor('gray')
 	#plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
 	#       ncol=2, mode="expand", borderaxespad=0.)
 	#plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 	#plt.tight_layout()
-	plt.savefig(img_out, bbox_extra_artists=(leg,), \
-		bbox_inches='tight',format='eps',dpi=440)
+	plt.legend(loc='best')
+	plt.savefig(img_out, \
+		#bbox_extra_artists=(leg,), \
+		bbox_inches='tight',format='eps',dpi=550)
 	#plt.clf()
 
 # does nto work for now
@@ -436,12 +437,12 @@ def main_complex():
 		xaxis.append(threshold)
 		#f_UNW.write(str(threshold) + '\t'+ str(s) + '\n')
 
-	plot_DA(xaxis, da_UNDIR_weighted_all, img_out_plot_UNDIR_W_all, "undir all", col ="r-")
-	plot_DA(xaxis, da_UNDIR_WEIGHTED_mutual, img_out_plot_UNDIR_W_mutual, "undir mutual", col ="c-")
-	plot_DA(xaxis, da_IN_OUT, img_out_plot_IN_OUT, "in_out", col="g.")
-	plot_DA(xaxis, da_OUT_IN, img_out_plot_OUT_IN, "out_in", col="b.")
-	plot_DA(xaxis, da_IN_IN, img_out_plot_IN_IN , "in_in", col="m.")
-	plot_DA(xaxis, da_OUT_OUT, img_out_plot_OUT_OUT, "out_out", col="y.")
+	plot_DA(xaxis, da_UNDIR_weighted_all, img_out_plot_UNDIR_W_all, "undir all", col ="r.")
+	plot_DA(xaxis, da_UNDIR_WEIGHTED_mutual, img_out_plot_UNDIR_W_mutual, "undir mutual", col ="c.")
+	plot_DA(xaxis, da_IN_OUT, img_out_plot_IN_OUT, "in-out", col="g-")
+	plot_DA(xaxis, da_OUT_IN, img_out_plot_OUT_IN, "out-in", col="b-")
+	plot_DA(xaxis, da_IN_IN, img_out_plot_IN_IN , "in-in", col="m-")
+	plot_DA(xaxis, da_OUT_OUT, img_out_plot_OUT_OUT, "out-out", col="y-")
 
 main_complex()
 #main()

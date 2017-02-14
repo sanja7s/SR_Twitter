@@ -14,17 +14,15 @@ from igraph import *
 from scipy.stats.stats import pearsonr
 from scipy import stats
 
+import seaborn as sns
+sns.set(color_codes=True, font_scale=2) 
+sns.set_style('whitegrid')
+
+
 WORKING_FOLDER = "../../../DATA/mention_graph/BigClam"
 os.chdir(WORKING_FOLDER)
 F_IN = 'MENT_COMM7scmtyvv.txt'
 f_in_graph = 'mention_graph_weights.dat'
-
-font = {'family' : 'sans-serif',
-		'variant' : 'normal',
-        'weight' : 'light',
-        'size'   : 24}
-
-matplotlib.rc('font', **font)
 
 # DONE
 def output_basic_stats_BigClam_COMM():
@@ -235,14 +233,72 @@ def find_overlapping_COMM():
 	#	print COMM, COMM_density3[COMM]
 	return COMM_density3
 
+# nodes with highest avg COMM membership
+def find_overlapping_COMM_MEDIAN_density():
+	COMM = 0
+	nodes_num_COMM = find_nodes_in_more_COMM()
+	COMM_density =  defaultdict(list)
+	input_file = codecs.open(F_IN, 'r', encoding='utf8')
+	for line in input_file:
+		line = line.split()
+		for node in line:
+			COMM_density[COMM].append(nodes_num_COMM[int(node)])
+		COMM += 1
+	COMM_density2 =  defaultdict(tuple)
+	for COMM in COMM_density:
+		COMM_density2[COMM] = (np.median(np.array(COMM_density[COMM])), len(COMM_density[COMM]))
+	COMM_density3 = OrderedDict(sorted(COMM_density2.items(), key=lambda t:t[1][0]))
+	#for COMM in COMM_density3:
+	#	print COMM, COMM_density3[COMM]
+	return COMM_density3
+
+def plot_COMM_size_vs_MEDIAN_density():
+
+	import seaborn as sns
+	sns.set(color_codes=True, font_scale=2) 
+
+	x = []
+	y = []
+
+	data = find_overlapping_COMM_MEDIAN_density()
+
+	for COMM in data:
+		x.append(data[COMM][0])
+		y.append(data[COMM][1])
+
+	x = np.array(x)
+	y = np.array(y)
+
+	print 'Corrcoef COMM size and density ',  pearsonr(np.array(x), np.array(y))
+	(r, p) = pearsonr(np.array(x), np.array(y))
+
+	lab = r'$r=' +  "{:.2f}".format(r) + '$, $p= ' + "{:.2f}".format(p) + '$'
+	xlabel = 'comm density'
+	ylabel = 'comm size'
+
+	#plt.scatter(x, y, edgecolors='none', c='c', label=lab)
+	sns.set_style("white")
+	g = sns.jointplot(x=x, y=y, kind='reg',annot_kws=dict(stat="r"), \
+		joint_kws={'line_kws':{'color':'gray', 'alpha':0.3, 'markeredgewidth':0}}).set_axis_labels(xlabel, ylabel)
+
+	regline = g.ax_joint.get_lines()[0]
+	regline.set_color('c')
+	regline.set_zorder('5')
+
+	labelsx = ['0','','1','', '2','', '3','','4']
+	g.ax_joint.set_xticklabels(labelsx)
+
+	#plt.legend(frameon=0, loc=2)
+	#plt.show()
+	#plt.tight_layout()
+	plt.savefig('node_comm_size_MEDIAN_density77.pdf',bbox_inches='tight' , dpi=550)
+	plt.show()
 
 
 def plot_COMM_size_vs_density():
 
 	import seaborn as sns
-	sns.set(color_codes=True)
-
-	sns.set(font_scale=2) 
+	sns.set(color_codes=True, font_scale=2) 
 
 	x = []
 	y = []
@@ -264,14 +320,22 @@ def plot_COMM_size_vs_density():
 	ylabel = 'comm size'
 
 	#plt.scatter(x, y, edgecolors='none', c='c', label=lab)
-	with sns.axes_style("white"):
-		g = sns.jointplot(x=x, y=y, kind="reg", color="c").set_axis_labels(xlabel, ylabel)
+	sns.set_style("white")
+	g = sns.jointplot(x=x, y=y, kind='reg',annot_kws=dict(stat="r"), \
+		joint_kws={'line_kws':{'color':'gray', 'alpha':0.3, 'markeredgewidth':0}}).set_axis_labels(xlabel, ylabel)
+
+	regline = g.ax_joint.get_lines()[0]
+	regline.set_color('c')
+	regline.set_zorder('5')
+
+	labelsx = ['0','','1','', '2','', '3','','4']
+	g.ax_joint.set_xticklabels(labelsx)
 
 	#plt.legend(frameon=0, loc=2)
 	#plt.show()
 	#plt.tight_layout()
-	plt.savefig('node_comm_size_density.eps',bbox_inches='tight' , dpi=550)
-
+	plt.savefig('node_comm_size_density77.pdf',bbox_inches='tight' , dpi=550)
+	plt.show()
 
 
 #########################
@@ -498,6 +562,9 @@ def calculate_pdf(ydata, logscale=True):
 	return x, y, lab
 
 def plot_pdf_node_in_COMM():
+
+	fig7s = plt.gcf()
+	fig7s.set_size_inches((8,6))
 	node_in_COMM = find_nodes_in_more_COMM()
 	ydata = node_in_COMM.values()
 	x, y,lab = calculate_pdf(ydata)
@@ -510,7 +577,7 @@ def plot_pdf_node_in_COMM():
 	#plt.title(r'Histogram for mention network pairwise SR: $\mu=' +  "{:.3f}".format(mu) + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$')
 	plt.grid(True)
 	plt.tight_layout()
-	plt.savefig('node_comm_membership_pdf77.eps',bbox_inches='tight' , dpi=550)
+	plt.savefig('node_comm_membership_pdf777.eps',bbox_inches='tight' , dpi=550)
 
 def plot_deg_vs_COMM_membership():
 	d, std = find_avg_deg_per_node_COMM_membership()
@@ -533,6 +600,9 @@ def plot_WEIGHTED_deg_vs_COMM_membership():
 	x = d.keys()
 	y = d.values()
 	e = std.values()
+	fig7s = plt.gcf()
+	fig7s.set_size_inches((8,6))
+	sns.set_style('white')
 	print 'Corrcoef strong commun int and comm membership ',  pearsonr(np.array(x), np.array(y))
 	plt.errorbar(x,y,e,linestyle="-",marker='*',color='maroon',label='mean strong communication intensity')
 	#plt.yscale('log', nonposy='clip')
@@ -546,6 +616,10 @@ def plot_WEIGHTED_deg_vs_COMM_membership():
 	plt.show()
 
 def plot_avg_neighborhood_SR_vs_COMM_membership():
+
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s = plt.gcf()
+	fig7s.set_size_inches((6,6))
 	d, std = find_avg_neighborhood_SR_per_node_COMM_membership()
 	x = d.keys()
 	y = d.values()
@@ -561,7 +635,7 @@ def plot_avg_neighborhood_SR_vs_COMM_membership():
 	plt.tight_layout()
 	#plt.title(r'Histogram for mention network pairwise SR: $\mu=' +  "{:.3f}".format(mu) + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$')
 	#plt.grid(True)
-	plt.savefig('node_comm_membership_vs_mean_SR.eps', bbox_inches='tight' ,dpi=550)
+	plt.savefig('node_comm_membership_vs_mean_SR77.eps', bbox_inches='tight' ,dpi=550)
 	plt.show()
 
 def plot_SEM_CAP_vs_COMM_membership():
@@ -569,6 +643,9 @@ def plot_SEM_CAP_vs_COMM_membership():
 	x = d.keys()
 	y = d.values()
 	e = std.values()
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s = plt.gcf()
+	fig7s.set_size_inches((6,6))
 	plt.errorbar(x,y,e,linestyle="-",marker='*',color='darkred',fmt='o',elinewidth=3.4)
 	#plt.yscale('log', nonposy='clip')
 	plt.xlabel('node comm membership')
@@ -578,7 +655,7 @@ def plot_SEM_CAP_vs_COMM_membership():
 	#plt.title(r'Histogram for mention network pairwise SR: $\mu=' +  "{:.3f}".format(mu) + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$')
 	#plt.grid(True)
 	plt.tight_layout()
-	plt.savefig('node_comm_membership_vs_avg_SEM_CAP6.eps', bbox_inches='tight',  dpi=550)
+	plt.savefig('node_comm_membership_vs_avg_SEM_CAP77.eps', bbox_inches='tight',  dpi=550)
 	plt.show()
 
 def plot_MEDIAN_SEM_CAP_vs_COMM_membership():
@@ -619,6 +696,11 @@ def plot_MEDIAN_ST_INC_vs_COMM_membership():
 	x = d.keys()
 	y = d.values()
 	e = std.values()
+
+
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s = plt.gcf()
+	fig7s.set_size_inches((6,6))
 	print 'Corrcoef MEDIAN ST INC and comm membership ',  pearsonr(np.array(x), np.array(y))
 	plt.errorbar(x,y,e,linestyle="-",marker='*',fmt='o',elinewidth=3.4,color='darkcyan')
 
@@ -629,7 +711,7 @@ def plot_MEDIAN_ST_INC_vs_COMM_membership():
 	plt.tight_layout()
 	#plt.title(r'Histogram for mention network pairwise SR: $\mu=' +  "{:.3f}".format(mu) + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$')
 	#plt.grid(True)
-	plt.savefig('node_comm_membership_vs_MEDIAN_ST_INC7.eps', bbox_inches='tight' , dpi=550)
+	plt.savefig('node_comm_membership_vs_MEDIAN_ST_INC77.eps', bbox_inches='tight' , dpi=550)
 	plt.show()
 
 def plot_sentiment_vs_COMM_membership():
@@ -651,24 +733,29 @@ def plot_sentiment_vs_COMM_membership():
 	plt.show()
 
 def plot_DIR_deg_vs_COMM_membership():
+
+
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s = plt.gcf()
+	fig7s.set_size_inches((6,6))
 	rIN_deg, rIN_std, rOUT_deg, rOUT_std = find_avg_DIR_deg_per_node_COMM_membership()
-	x1 = rIN_deg.keys()
-	y1 = rIN_deg.values()
-	e1 = rIN_std.values()
+	x1 = np.array(rIN_deg.keys())
+	y1 = np.array(rIN_deg.values())
+	e1 = np.array(rIN_std.values())
 	print 'Corrcoef weighted INdeg and comm membership ',  pearsonr(np.array(x1), np.array(y1))
-	x2 = rOUT_deg.keys()
-	y2 = rOUT_deg.values()
-	e2 = rOUT_std.values()
+	x2 = np.array(rOUT_deg.keys())
+	y2 = np.array(rOUT_deg.values())
+	e2 = np.array(rOUT_std.values())
 	print 'Corrcoef weighted OUTdeg and comm membership ',  pearsonr(np.array(x2), np.array(y2))
-	plt.errorbar(x1,y1,e1,linestyle="-",marker='*',fmt='o',elinewidth=3.4,color='darkred',label='popularity')
-	plt.errorbar(x2,y2,e2,linestyle="-",marker='*',fmt='o',elinewidth=3.4,color='darkblue',label='activity')
+	plt.errorbar(x1-0.07,y1,e1,linestyle="-",marker='*',fmt='o',elinewidth=3.4,color='darkred',label='popularity')
+	plt.errorbar(x2+0.07,y2,e2,linestyle="-",marker='*',fmt='o',elinewidth=3.4,color='darkblue',label='activity')
 	plt.xlabel('node comm membership')
 	plt.ylabel('mean node social capital')
 	plt.legend(loc='best',frameon=False)
 	plt.xlim(0,11)
 	plt.tight_layout()
 	#plt.grid(True)
-	plt.savefig('node_comm_membership_vs_avg_DIR_deg7.eps', bbox_inches='tight' , dpi=550)
+	plt.savefig('node_comm_membership_vs_avg_DIR_deg11777.eps', bbox_inches='tight' , dpi=550)
 	plt.show()
 
 def plot_MEDIAN_DIR_deg_vs_COMM_membership():
@@ -689,6 +776,7 @@ def plot_MEDIAN_DIR_deg_vs_COMM_membership():
 	plt.savefig('node_comm_membership_vs_MEDIAN_DIR_deg3.eps', dpi=550)
 	plt.show()
 
+plot_DIR_deg_vs_COMM_membership()
 #plot_WEIGHTED_deg_vs_COMM_membership()
 #plot_MEDIAN_ST_INC_vs_COMM_membership()
 #plot_sentiment_vs_COMM_membership()
@@ -703,3 +791,5 @@ def plot_MEDIAN_DIR_deg_vs_COMM_membership():
 #plot_MEDIAN_SEM_CAP_vs_COMM_membership()
 
 #plot_COMM_size_vs_density()
+
+#plot_COMM_size_vs_MEDIAN_density()

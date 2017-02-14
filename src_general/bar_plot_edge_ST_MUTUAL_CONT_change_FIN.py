@@ -5,12 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse, Polygon
 
+
 width = 0.37       # the width of the bars
 
 font = {'family' : 'sans-serif',
 		'variant' : 'normal',
         'weight' : 'light',
-        'size'   : 16}
+        'size'   : 14}
 
 matplotlib.rc('font', **font)
 
@@ -35,7 +36,7 @@ def plot_bars_with_stdev_MO(SRmeans, SRStd):
 	#ax.set_ylabel('Avg Rel Soc St')
 	ax.set_title('Whole network')
 	ax.set_xticks(ind + width)
-	ax.set_xticklabels(('June', 'July', 'August', 'Sept', 'Oct', 'Nov'))
+	ax.set_xticklabels(('Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov'))
 
 	ax.set_ylim([-10, 30])
 	ax.set_yticks((0,30))
@@ -263,7 +264,7 @@ def plot_bars_with_stdev_MO_2(SRmeans, SRStd):
 	#ax.set_ylabel('Avg Rel Soc St')
 	ax.set_title('Persisting interactions')
 	ax.set_xticks(ind + width)
-	ax.set_xticklabels(('June', 'July', 'August', 'Sept', 'Oct', 'Nov'))
+	ax.set_xticklabels(('Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov'))
 
 	#ax.set_ylim([-0.1, 0.35])
 	#ax.set_yticks((-0.1,0.1,0.3))
