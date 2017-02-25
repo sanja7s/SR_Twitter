@@ -67,7 +67,7 @@ def plot_DE(xaxis, da1, da, no, label1, label, col1, col):
 	y1 = np.array(da1)
 	ax1.plot(x, y, col, label=label)
 	ax1.plot(x, y1, col1, label=label1)
-	ax1.set_xlabel('SR threshold')
+	ax1.set_xlabel('$SR_{th}$')
 	ax1.set_ylabel('Density', color = 'm')
 	for tl in ax1.get_yticklabels():
 	    tl.set_color('m')
@@ -77,7 +77,7 @@ def plot_DE(xaxis, da1, da, no, label1, label, col1, col):
 	
 	ax2 = ax1.twinx()
 	y3 = np.array(no)
-	ax2.plot(x, y3/1000, 'c+', label='size of largest comp')
+	ax2.plot(x, y3/1000, 'c+', label='size of largest comp.')
 	ax2.set_ylabel('# nodes (in thousands)', color = 'c')
 	for tl in ax2.get_yticklabels():
 	    tl.set_color('c')

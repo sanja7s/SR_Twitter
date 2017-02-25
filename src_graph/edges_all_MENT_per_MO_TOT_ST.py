@@ -56,7 +56,7 @@ def extract_edges_per_MO_REL_ST_with_STDEV_POP():
 				popB = G.strength(dest_id, mode=IN, weights='weight')
 			except IndexError:
 				popB = 0 
-			diff = abs(popA - popB)
+			diff = abs(popA + popB)
 			TOT[MO].append(diff)
 		i += 1
 		MO = MONTHS[i]
@@ -102,7 +102,7 @@ def extract_edges_per_MO_REL_ST_with_STDEV_ACT():
 				popB = G.strength(dest_id, mode=OUT, weights='weight')
 			except IndexError:
 				popB = 0 
-			diff = abs(popA - popB)
+			diff = abs(popA + popB)
 			TOT[MO].append(diff)
 		i += 1
 		MO = MONTHS[i]
@@ -123,8 +123,10 @@ def extract_edges_per_MO_REL_ST_with_STDEV_MUTUAL_UNW():
 
 	MO_MENT = defaultdict(int)
 	for MO in MONTHS:
+		# strong
 		MO_MENT[MO] = read_in_MO_graph_MUTUAL_UNW(MO).copy()
-
+		# weak
+		#MO_MENT[MO] = read_in_MO_graph(MO).copy()
 	cnt = 0
 	TOT = defaultdict(list)
 
@@ -145,7 +147,7 @@ def extract_edges_per_MO_REL_ST_with_STDEV_MUTUAL_UNW():
 				popB = G.degree(dest_id)
 			except IndexError:
 				popB = 0 
-			diff = abs(popA - popB)
+			diff = abs(popA + popB)
 			if diff == 552:
 				userA = G.vs[src_id]['name']
 				uesrB = G.vs[dest_id]['name']
@@ -164,15 +166,17 @@ def extract_edges_per_MO_REL_ST_with_STDEV_MUTUAL_UNW():
 		avg = np.mean(TOT[MO])
 		std = np.std(TOT[MO])
 		print TOT[MO]
-		print "Average REL ST MUTUAL CONTACTS, stdev %f, %f, at the time %s " % \
+		print "Average TOT ST MUTUAL CONTACTS, stdev %f, %f, at the time %s " % \
 		(avg, std, MO)
 
 def extract_edges_per_MO_REL_ST_with_STDEV_TOTAL_UNW():
 
 	MO_MENT = defaultdict(int)
 	for MO in MONTHS:
+		# strong
+		#MO_MENT[MO] = read_in_MO_graph_MUTUAL_UNW(MO).copy()
+		# weak
 		MO_MENT[MO] = read_in_MO_graph(MO).copy()
-
 	cnt = 0
 	TOT = defaultdict(list)
 
@@ -193,12 +197,12 @@ def extract_edges_per_MO_REL_ST_with_STDEV_TOTAL_UNW():
 				popB = G.degree(dest_id)
 			except IndexError:
 				popB = 0 
-			diff = abs(popA - popB)
+			diff = abs(popA + popB)
 			if diff == 552:
 				userA = G.vs[src_id]['name']
 				uesrB = G.vs[dest_id]['name']
-				#print popA, popB
-				#print userA, uesrB 
+				print popA, popB
+				print userA, uesrB 
 			TOT[MO].append(diff)
 		i += 1
 		MO = MONTHS[i]
@@ -212,16 +216,16 @@ def extract_edges_per_MO_REL_ST_with_STDEV_TOTAL_UNW():
 		avg = np.mean(TOT[MO])
 		std = np.std(TOT[MO])
 		print TOT[MO]
-		print "Average REL ST MUTUAL CONTACTS, stdev %f, %f, at the time %s " % \
+		print "Average TOT ST TOTAL CONTACTS, stdev %f, %f, at the time %s " % \
 		(avg, std, MO)
 
 
-print 'strong contacts'
+
+print 'Strong'
 extract_edges_per_MO_REL_ST_with_STDEV_MUTUAL_UNW()
-	
-print 'all including weak contacts'
+print 'Total, including weak'
 extract_edges_per_MO_REL_ST_with_STDEV_TOTAL_UNW()
-	
+
 
 
 

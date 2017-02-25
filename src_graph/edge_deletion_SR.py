@@ -89,7 +89,6 @@ def extract_edge_deletion_SR():
 	print "Average SR before %f, at the time %f and after %f edges deletion " % \
 		(TOT_SR_BEFORE/cnt, TOT_SR_DELETION/cnt, TOT_SR_AFTER/cnt)
 
-
 def extract_edge_deletion_SR_clean():
 
 	edges_MOs = defaultdict(int)
@@ -164,7 +163,6 @@ def extract_edge_deletion_SR_clean():
 	print "Average SR before %f, at the time %f and after %f edges deletion " % \
 		(TOT_SR_BEFORE/cnt, TOT_SR_DELETION/cnt, TOT_SR_AFTER/cnt)
 
-
 def extract_edge_deletion_SR_with_STDEV():
 
 	edges_MOs = defaultdict(int)
@@ -185,6 +183,9 @@ def extract_edge_deletion_SR_with_STDEV():
 			MO_deletion = int(MO_deletion)
 			if MO_deletion <= 6 or MO_deletion >= 10:
 				continue
+			# remove or not
+			#if not(MO_formation != 4):
+			#	continue
 
 			cnt += 1
 
@@ -253,6 +254,10 @@ def extract_edge_deletion_SR_with_STDEV():
 
 	print "Average SR %f and stdev %f before, at the time %f, %f and after %f, %f edges deletion " % \
 		(avg_bef, stdev_bef, avg_at, stdev_at, avg_aft, stdev_aft)
+
+	print
+	print avg_bef, avg_at, avg_aft
+	print stdev_bef, stdev_at, stdev_aft
 
 def extract_edge_deletion_SR_clean_with_STDEV():
 
@@ -345,7 +350,6 @@ def extract_edge_deletion_SR_clean_with_STDEV():
 
 	print "Average SR %f and stdev %f before, at the time %f, %f and after %f, %f edges deletion " % \
 		(avg_bef, stdev_bef, avg_at, stdev_at, avg_aft, stdev_aft)
-
 
 def read_in_all_monthly_SR():
 

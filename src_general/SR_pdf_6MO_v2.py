@@ -29,9 +29,11 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 cmBlues = plt.get_cmap('Blues') 
 cmReds = plt.get_cmap('Reds') 
+cmGreens = plt.get_cmap('Greens') 
 cNorm  = colors.Normalize(vmin=5, vmax=10) # 11 for all MOs
 scalarMapBlues = cmx.ScalarMappable(norm=cNorm, cmap=cmBlues)
 scalarMapReds = cmx.ScalarMappable(norm=cNorm, cmap=cmReds)
+scalarMapGreens = cmx.ScalarMappable(norm=cNorm, cmap=cmGreens)
 
 def read_in_MENT_SR(f2, threshold = 0):
 	cnt_MO_edges = 0
@@ -40,14 +42,27 @@ def read_in_MENT_SR(f2, threshold = 0):
 		(uid1, uid2, SR, w1, w2) = line.split()
 		uid1 = int(uid1)
 		uid2 = int(uid2)
-		if int(w1) == 0 or int(w2) == 0:
-			continue
+		#if int(w1) == 0 or int(w2) == 0:
+		#	continue
 		cnt_MO_edges += 1
 		SR = float(SR)
 		if uid1 != uid2:
 			edges_SR.append(SR)
 	print 'Monthly edges ', cnt_MO_edges
 	return edges_SR
+
+def read_in_MENT_edges(threshold = 0):
+	cnt_edges = 0
+	edges = defaultdict(int)
+	for line in open('mention_graph_weights_7s.dat', 'r'):
+		(uid1, uid2, w) = line.split()
+		uid1 = int(uid1)
+		uid2 = int(uid2)
+		cnt_edges += 1
+		if uid1 != uid2:
+			edges[(uid1,uid2)] = 1
+	print 'Total edges ', cnt_edges
+	return edges
 
 def read_in_full_SR(f_name, threshold = 0):
 	edges_SR = []
@@ -62,6 +77,29 @@ def read_in_full_SR(f_name, threshold = 0):
 				edges_SR.append(SR)
 		f.close()
 		print 'part ', s, ' read'				
+	return edges_SR
+
+def read_in_NOMENT_SR(f_name, threshold = 0):
+	MENT_edges = read_in_MENT_edges()
+	edges_SR = []
+	cnt_omitted = 0
+	cnt_edges = 0
+	for s in parts:
+		f = open(f_name + s, 'r')
+		for line in f:
+			(uid1, uid2, SR) = line.split()
+			uid1 = int(uid1)
+			uid2 = int(uid2)
+			SR = float(SR)
+			if (uid1,uid2) in MENT_edges or (uid2,uid1) in MENT_edges:
+				cnt_omitted += 1
+				continue
+			if uid1 != uid2:
+				edges_SR.append(SR)
+				cnt_edges += 1
+		f.close()
+		print 'part ', s, ' read'	
+		print cnt_edges, cnt_omitted			
 	return edges_SR
 
 def plot_one_seaborn(MO, z, c):
@@ -97,19 +135,23 @@ def main_MENT_pdf_MO():
 	for MO in MONTHS2:
 		f = open(str(MO) + "mention_edges_monthly_SR", "r")
 		edges_SR_MENT = read_in_MENT_SR(f)
-		if MO == '6':
-			edges_SR_MENT_old = edges_SR_MENT
+		print MO, len(edges_SR_MENT)
+		z = np.array(edges_SR_MENT, dtype=np.float) 
+		mu = np.mean(z)
+		sigma = np.std(z)
+		#if MO == '6':
+		#	edges_SR_MENT_old = edges_SR_MENT
 			
-		if MO == '10':
-			s = stats.ks_2samp(edges_SR_MENT_old, edges_SR_MENT)
-			print s
+		#if MO == '10':
+		#	s = stats.ks_2samp(edges_SR_MENT_old, edges_SR_MENT)
+		#	print s
 		
 
 		c = scalarMapBlues.to_rgba(int(MO))
 		plot_one_seaborn(MO, edges_SR_MENT, c)	
 	
 	os.chdir("../")
-	plt.savefig("MO_MENT_SR_FIN_7s_FIN_log777_MEDIAN.eps", bbox_inches='tight' , dpi = 550)
+	plt.savefig("MO_MENT_SR_FIN_7s_FIN_log77777_xoxox.eps", bbox_inches='tight' , dpi = 550)
 
 def main_SR_pdf_MO():
 	x = defaultdict(list)
@@ -118,6 +160,11 @@ def main_SR_pdf_MO():
 	for MO in MONTHS2:
 		fn = MO + 'MOSR/' + MO + '_all_user_SR_part_'
 		edges_SR_SR = read_in_full_SR(fn)
+		z = np.array(edges_SR_SR, dtype=np.float) 
+		mu = np.mean(z)
+		sigma = np.std(z)
+		print MO + ' TOTAL $\mu=' +  "{:.3f}".format(mu)\
+		 + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$'
 		ESR = np.random.choice(edges_SR_SR, 100000)
 		if MO == '6':
 			ESR_old = ESR
@@ -130,11 +177,39 @@ def main_SR_pdf_MO():
 
 	plt.savefig("MO_SR_SR_hist_FIN_7s_FIN1144777.eps", bbox_inches='tight' ,dpi = 550)
 
+def main_NOMENT_pdf_MO():
+	x = defaultdict(list)
+	y = defaultdict(list)
+	l = defaultdict(str)
+	for MO in MONTHS2:
+		fn = MO + 'MOSR/' + MO + '_all_user_SR_part_'
+		edges_SR_SR = read_in_NOMENT_SR(fn)
+		print MO, len(edges_SR_SR)
+		z = np.array(edges_SR_SR, dtype=np.float) 
+		mu = np.mean(z)
+		sigma = np.std(z)
+		print MO + ' TOTAL NOMENT $\mu=' +  "{:.3f}".format(mu)\
+		 + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$'
+		ESR = np.random.choice(edges_SR_SR, 1000000)
+		if MO == '6':
+			ESR_old = ESR
+			
+		if MO == '10':
+			s = stats.ks_2samp(ESR_old, ESR)
+			print s
+		c = scalarMapGreens.to_rgba(int(MO))
+		plot_one_seaborn(MO, ESR, c)		
+
+	plt.savefig("7sNOMENT_hist_FIN_7s_FIN114477777777777777.eps", bbox_inches='tight' ,dpi = 550)
+
+
 
 fig7s = plt.gcf()
 plt.rcParams['figure.figsize']=(6,6)
 fig7s.set_size_inches((6,6))
 plt.figure(figsize=(6, 6))
 
-main_SR_pdf_MO()
+#main_SR_pdf_MO()
 #main_MENT_pdf_MO()
+
+main_NOMENT_pdf_MO()

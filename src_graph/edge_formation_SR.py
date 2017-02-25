@@ -184,12 +184,13 @@ def extract_edge_formation_SR_with_STDEV():
 		for line in input_file:
 			(userA, userB, MO_formation, MO_deletion) = line.split()
 			MO_formation = int(MO_formation)
-
+			MO_deletion = int(MO_deletion)
 			if MO_formation == 4 or MO_formation >= 10:
 				continue
 			# remove or no
-			if MO_deletion >= 6 and MO_deletion <= 10:
-				continue
+			#if not(MO_deletion <= 11):
+			#	continue
+
 			cnt += 1
 
 			userA = int(userA)
@@ -254,6 +255,10 @@ def extract_edge_formation_SR_with_STDEV():
 	print "Average SR %f and stdev %f before, at the time %f, %f and after %f, %f edges formation " % \
 		(avg_bef, stdev_bef, avg_at, stdev_at, avg_aft, stdev_aft)
 
+	print
+	print avg_bef, avg_at, avg_aft
+	print stdev_bef, stdev_at, stdev_aft
+
 
 def extract_edge_formation_SR_clean_with_STDEV():
 
@@ -278,8 +283,8 @@ def extract_edge_formation_SR_clean_with_STDEV():
 			if MO_formation == 4 or MO_formation >= 10:
 				continue
 
-			if MO_deletion > 6 and MO_deletion < 10:
-				continue
+			#if MO_deletion > 6 and MO_deletion < 10:
+			#	continue
 
 			cnt += 1
 

@@ -39,8 +39,8 @@ def read_in_MENT_SR(f2, threshold = 0):
 		(uid1, uid2, SR, w1, w2) = line.split()
 		uid1 = int(uid1)
 		uid2 = int(uid2)
-		if int(w1) == 0 or int(w2) == 0:
-			continue
+		#if int(w1) == 0 or int(w2) == 0:
+		#	continue
 		cnt_MO_edges += 1
 		SR = float(SR)
 		if uid1 != uid2:
@@ -105,7 +105,7 @@ def main_MENT_pdf_MO():
 		plot_one(MO, x[MO], y[MO], l[MO], c)	
 	
 	os.chdir("../")
-	plt.savefig("MO_MENT_SR_FIN_7s.eps", dpi = 550)
+	plt.savefig("MO_MENT_SR_FIN_7xoxos.eps", dpi = 550)
 
 def main_SR_pdf_MO():
 	x = defaultdict(list)
@@ -120,7 +120,7 @@ def main_SR_pdf_MO():
 		c = scalarMapReds.to_rgba(int(MO))
 		plot_one(MO, x[MO], y[MO], l[MO], c)	
 
-	plt.savefig("MO_SR_SR_hist_FIN_7s.eps", dpi = 550)
+	plt.savefig("MO_SR_SR_hist_FIN_77777s.eps", dpi = 550)
 
-main_SR_pdf_MO()
+#main_SR_pdf_MO()
 main_MENT_pdf_MO()

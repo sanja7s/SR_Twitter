@@ -76,7 +76,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_POP():
 				popB = G.strength(nB[0].index, mode=IN, weights='weight')
 			except IndexError:
 				popB = 0 
-			prior = abs(popA - popB)
+			prior = abs(popA + popB)
 
 			MO_deletion = str(MO_deletion)
 			G = MO_MENT[MO_deletion]
@@ -84,7 +84,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_POP():
 			nB = G.vs.select(name = str(u2))
 			popA = G.strength(nA[0].index, mode=IN, weights='weight')
 			popB = G.strength(nB[0].index, mode=IN, weights='weight')
-			deletion = abs(popA - popB)
+			deletion = abs(popA + popB)
 
 			MO_after = MONTHS[int(MO_deletion)+1-5]
 			MO_after = str(MO_after)
@@ -99,7 +99,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_POP():
 				popB = G.strength(nB[0].index, mode=IN, weights='weight')
 			except IndexError:
 				popB = 0 
-			after = abs(popA - popB)
+			after = abs(popA + popB)
 
 			TOT_AFTER.append(after)
 			TOT_DELETION.append(deletion)
@@ -264,7 +264,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_ACTIVITY():
 				popB = G.strength(nB[0].index, mode=OUT, weights='weight')
 			except IndexError:
 				popB = 0 
-			prior = abs(popA - popB)
+			prior = abs(popA + popB)
 
 			MO_deletion = str(MO_deletion)
 			G = MO_MENT[MO_deletion]
@@ -272,7 +272,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_ACTIVITY():
 			nB = G.vs.select(name = str(u2))
 			popA = G.strength(nA[0].index, mode=OUT, weights='weight')
 			popB = G.strength(nB[0].index, mode=OUT, weights='weight')
-			deletion = abs(popA - popB)
+			deletion = abs(popA + popB)
 
 			MO_after = MONTHS[int(MO_deletion)+1-5]
 			MO_after = str(MO_after)
@@ -287,7 +287,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_ACTIVITY():
 				popB = G.strength(nB[0].index, mode=OUT, weights='weight')
 			except IndexError:
 				popB = 0 
-			after = abs(popA - popB)
+			after = abs(popA + popB)
 
 			TOT_AFTER.append(after)
 			TOT_DELETION.append(deletion)
@@ -317,109 +317,14 @@ def extract_edge_deletion_REL_ST_with_STDEV_ACTIVITY():
 	print avg_bef, avg_at, avg_aft
 	print stdev_bef, stdev_at, stdev_aft
 
-def extract_edge_deletion_REL_ST_with_STDEV_MUTUAL_UNW():
-
-	MO_MENT = defaultdict(int)
-	for MO in MONTHS:
-		MO_MENT[MO] = read_in_MO_graph_MUTUAL_UNW(MO).copy()
-
-	output_file = open(F_OUT, 'w')
-	cnt = 0
-
-	TOT_BEFORE = []
-	TOT_DELETION = []
-	TOT_AFTER = []
-	with codecs.open(F_IN,'r', encoding='utf8') as input_file:
-		for line in input_file:
-			(userA, userB, MO_formation, MO_deletion) = line.split()
-			MO_formation = int(MO_formation)
-			MO_deletion = int(MO_deletion)
-			if MO_deletion <= 6 or MO_deletion >= 10:
-				continue
-			# remove or not -- keep for persisting
-			# NOT FOR only non persisting
-			if (MO_formation != 4):
-				continue
-			cnt += 1
-			userA = int(userA)
-			userB = int(userB)
-			if userA < userB:
-				u1 = userA
-				u2 = userB
-			else:
-				u1 = userB
-				u2 = userA
-			MO_prior = MONTHS[int(MO_deletion)-1-5]
-			MO_prior = str(MO_prior)
-			G = MO_MENT[MO_prior]
-			nA = G.vs.select(name = str(u1))
-			nB = G.vs.select(name = str(u2))
-			try:
-				popA = G.degree(nA[0].index)
-			except IndexError:
-				popA = 0 
-			try:
-				popB = G.degree(nB[0].index)
-			except IndexError:
-				popB = 0 
-			prior = abs(popA - popB)
-
-			MO_deletion = str(MO_deletion)
-			G = MO_MENT[MO_deletion]
-			nA = G.vs.select(name = str(u1))
-			nB = G.vs.select(name = str(u2))
-			popA = G.degree(nA[0].index)
-			popB = G.degree(nB[0].index)
-			deletion = abs(popA - popB)
-
-			MO_after = MONTHS[int(MO_deletion)+1-5]
-			MO_after = str(MO_after)
-			G = MO_MENT[MO_after]
-			nA = G.vs.select(name = str(u1))
-			nB = G.vs.select(name = str(u2))
-			try:
-				popA = G.degree(nA[0].index)
-			except IndexError:
-				popA = 0 
-			try:
-				popB = G.degree(nB[0].index)
-			except IndexError:
-				popB = 0 
-			after = abs(popA - popB)
-
-			TOT_AFTER.append(after)
-			TOT_DELETION.append(deletion)
-			TOT_BEFORE.append(prior)
-
-			output_file.write(str(u1) + '\t' + str(u2) + '\t' + str(MO_deletion) + '\t' + \
-				str(prior)+ '\t' + str(deletion)+ '\t' + str(after) + '\n')
-	print "processed %d edges " % cnt
-	cnt = float(cnt)
-
-	TOT_BEFORE = np.array(TOT_BEFORE)
-	TOT_DELETION = np.array(TOT_DELETION)
-	TOT_AFTER = np.array(TOT_AFTER)
-
-	avg_bef = np.mean(TOT_BEFORE)
-	stdev_bef = np.std(TOT_BEFORE, dtype=np.float64)
-
-	avg_at = np.mean(TOT_DELETION)
-	stdev_at = np.std(TOT_DELETION, dtype=np.float64)
-
-	avg_aft = np.mean(TOT_AFTER)
-	stdev_aft = np.std(TOT_AFTER, dtype=np.float64)
-
-	print "Average REL ST MUTUAL CONTACTS %f and stdev %f before, at the time %f, %f and after %f, %f edges deletion " % \
-		(avg_bef, stdev_bef, avg_at, stdev_at, avg_aft, stdev_aft)
-	print
-	print avg_bef, avg_at, avg_aft
-	print stdev_bef, stdev_at, stdev_aft
-
 def extract_edge_deletion_REL_ST_with_STDEV_TOTAL_UNW():
 
 	MO_MENT = defaultdict(int)
 	for MO in MONTHS:
+		# for strong
 		MO_MENT[MO] = read_in_MO_graph(MO).copy()
+		# for weak and all
+		#MO_MENT[MO] = read_in_MO_graph(MO).copy()
 
 	output_file = open(F_OUT, 'w')
 	cnt = 0
@@ -434,9 +339,8 @@ def extract_edge_deletion_REL_ST_with_STDEV_TOTAL_UNW():
 			MO_deletion = int(MO_deletion)
 			if MO_deletion <= 6 or MO_deletion >= 10:
 				continue
-			# remove or not; keep for persisting
-			# NOT FOR only non persisting
-			if (MO_formation != 4):
+			# remove or not
+			if MO_formation != 4:
 				continue
 			cnt += 1
 			userA = int(userA)
@@ -460,7 +364,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_TOTAL_UNW():
 				popB = G.degree(nB[0].index)
 			except IndexError:
 				popB = 0 
-			prior = abs(popA - popB)
+			prior = abs(popA + popB)
 
 			MO_deletion = str(MO_deletion)
 			G = MO_MENT[MO_deletion]
@@ -468,7 +372,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_TOTAL_UNW():
 			nB = G.vs.select(name = str(u2))
 			popA = G.degree(nA[0].index)
 			popB = G.degree(nB[0].index)
-			deletion = abs(popA - popB)
+			deletion = abs(popA + popB)
 
 			MO_after = MONTHS[int(MO_deletion)+1-5]
 			MO_after = str(MO_after)
@@ -483,7 +387,7 @@ def extract_edge_deletion_REL_ST_with_STDEV_TOTAL_UNW():
 				popB = G.degree(nB[0].index)
 			except IndexError:
 				popB = 0 
-			after = abs(popA - popB)
+			after = abs(popA + popB)
 
 			TOT_AFTER.append(after)
 			TOT_DELETION.append(deletion)
@@ -513,15 +417,107 @@ def extract_edge_deletion_REL_ST_with_STDEV_TOTAL_UNW():
 	print avg_bef, avg_at, avg_aft
 	print stdev_bef, stdev_at, stdev_aft
 
+def extract_edge_deletion_REL_ST_with_STDEV_MUTUAL_UNW():
 
+	MO_MENT = defaultdict(int)
+	for MO in MONTHS:
+		# for strong
+		MO_MENT[MO] = read_in_MO_graph_MUTUAL_UNW(MO).copy()
+		# for weak and all
+		#MO_MENT[MO] = read_in_MO_graph(MO).copy()
 
-print 'STRONG contacts'
-# strong
+	output_file = open(F_OUT, 'w')
+	cnt = 0
+
+	TOT_BEFORE = []
+	TOT_DELETION = []
+	TOT_AFTER = []
+	with codecs.open(F_IN,'r', encoding='utf8') as input_file:
+		for line in input_file:
+			(userA, userB, MO_formation, MO_deletion) = line.split()
+			MO_formation = int(MO_formation)
+			MO_deletion = int(MO_deletion)
+			if MO_deletion <= 6 or MO_deletion >= 10:
+				continue
+			# remove or not
+			if MO_formation != 4:
+				continue
+			cnt += 1
+			userA = int(userA)
+			userB = int(userB)
+			if userA < userB:
+				u1 = userA
+				u2 = userB
+			else:
+				u1 = userB
+				u2 = userA
+			MO_prior = MONTHS[int(MO_deletion)-1-5]
+			MO_prior = str(MO_prior)
+			G = MO_MENT[MO_prior]
+			nA = G.vs.select(name = str(u1))
+			nB = G.vs.select(name = str(u2))
+			try:
+				popA = G.degree(nA[0].index)
+			except IndexError:
+				popA = 0 
+			try:
+				popB = G.degree(nB[0].index)
+			except IndexError:
+				popB = 0 
+			prior = abs(popA + popB)
+
+			MO_deletion = str(MO_deletion)
+			G = MO_MENT[MO_deletion]
+			nA = G.vs.select(name = str(u1))
+			nB = G.vs.select(name = str(u2))
+			popA = G.degree(nA[0].index)
+			popB = G.degree(nB[0].index)
+			deletion = abs(popA + popB)
+
+			MO_after = MONTHS[int(MO_deletion)+1-5]
+			MO_after = str(MO_after)
+			G = MO_MENT[MO_after]
+			nA = G.vs.select(name = str(u1))
+			nB = G.vs.select(name = str(u2))
+			try:
+				popA = G.degree(nA[0].index)
+			except IndexError:
+				popA = 0 
+			try:
+				popB = G.degree(nB[0].index)
+			except IndexError:
+				popB = 0 
+			after = abs(popA + popB)
+
+			TOT_AFTER.append(after)
+			TOT_DELETION.append(deletion)
+			TOT_BEFORE.append(prior)
+
+			output_file.write(str(u1) + '\t' + str(u2) + '\t' + str(MO_deletion) + '\t' + \
+				str(prior)+ '\t' + str(deletion)+ '\t' + str(after) + '\n')
+	print "processed %d edges " % cnt
+	cnt = float(cnt)
+
+	TOT_BEFORE = np.array(TOT_BEFORE)
+	TOT_DELETION = np.array(TOT_DELETION)
+	TOT_AFTER = np.array(TOT_AFTER)
+
+	avg_bef = np.mean(TOT_BEFORE)
+	stdev_bef = np.std(TOT_BEFORE, dtype=np.float64)
+
+	avg_at = np.mean(TOT_DELETION)
+	stdev_at = np.std(TOT_DELETION, dtype=np.float64)
+
+	avg_aft = np.mean(TOT_AFTER)
+	stdev_aft = np.std(TOT_AFTER, dtype=np.float64)
+
+	print "Average REL ST MUTUAL CONTACTS %f and stdev %f before, at the time %f, %f and after %f, %f edges deletion " % \
+		(avg_bef, stdev_bef, avg_at, stdev_at, avg_aft, stdev_aft)
+	print
+	print avg_bef, avg_at, avg_aft
+	print stdev_bef, stdev_at, stdev_aft
+
+print 'Strong contacts'
 extract_edge_deletion_REL_ST_with_STDEV_MUTUAL_UNW()
-
-print 'TOTAL including weak contacts'
-# total
+print 'Total including weak contacts'
 extract_edge_deletion_REL_ST_with_STDEV_TOTAL_UNW()
-
-
-

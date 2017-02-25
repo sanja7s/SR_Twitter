@@ -334,7 +334,7 @@ def plot_COMM_size_vs_density():
 	#plt.legend(frameon=0, loc=2)
 	#plt.show()
 	#plt.tight_layout()
-	plt.savefig('node_comm_size_density77.pdf',bbox_inches='tight' , dpi=550)
+	plt.savefig('node_comm_size_density777.pdf',bbox_inches='tight' , dpi=550)
 	plt.show()
 
 
@@ -776,7 +776,7 @@ def plot_MEDIAN_DIR_deg_vs_COMM_membership():
 	plt.savefig('node_comm_membership_vs_MEDIAN_DIR_deg3.eps', dpi=550)
 	plt.show()
 
-plot_DIR_deg_vs_COMM_membership()
+#plot_DIR_deg_vs_COMM_membership()
 #plot_WEIGHTED_deg_vs_COMM_membership()
 #plot_MEDIAN_ST_INC_vs_COMM_membership()
 #plot_sentiment_vs_COMM_membership()
@@ -790,6 +790,6 @@ plot_DIR_deg_vs_COMM_membership()
 #plot_pdf_node_in_COMM()
 #plot_MEDIAN_SEM_CAP_vs_COMM_membership()
 
-#plot_COMM_size_vs_density()
+plot_COMM_size_vs_density()
 
 #plot_COMM_size_vs_MEDIAN_density()

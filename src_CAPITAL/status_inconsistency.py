@@ -377,12 +377,60 @@ def plot_edge_weight_vs_inconsistency(fn):
 	fig7s.set_size_inches((6,6))
 	plt.figure(figsize=(6, 6))
 	sns.set_style("white")
-	g = sns.jointplot(x=inc, y=w, kind="scatter", annot_kws=dict(stat="r"), color="green", xlim=(-1.07,1.07)).set_axis_labels(xlabel, ylabel)
+	g = sns.jointplot(x=inc, y=w, kind="scatter", annot_kws=dict(stat="r"),\
+	 color="green", xlim=(-1.07,1.07)).set_axis_labels(xlabel, ylabel)
 
 	#plt.tight_layout()
 	
 	#plt.grid(True)
-	plt.savefig('dir_edge_weight_vs_incon_float7s22scatter7.eps', dpi=500, bbox_inches='tight')
+	plt.savefig('dir_edge_weight_vs_incon_float7s22scatter7777.eps', dpi=500, bbox_inches='tight')
+
+
+def plot_edge_weight_vs_inconsistency_binning(fn):
+	s = read_in_edge_weight_inconsistency(file_name=fn)
+	#coef_soc = 100
+	w = []
+	inc = []
+	
+	for el in s:
+		# weight
+		w.append(el)
+		# inconsistency
+		einc = s[el]
+		inc.append(einc)
+
+	w=np.array(w)
+	inc=np.array(inc)
+	print np.corrcoef(w,inc)
+
+	print pearsonr(w, inc)
+
+	ylabel = '$CI(e)$'
+	xlabel = '$st_{inc}(e)$'
+
+	plt.clf()
+	fig7s = plt.gcf()
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s.set_size_inches((6,6))
+	plt.figure(figsize=(6, 6))
+	sns.set_style("white")
+
+	#g = sns.jointplot(x=inc, y=w, kind="scatter", annot_kws=dict(stat="r"),\
+	# color="green", xlim=(-1.07,1.07)).set_axis_labels(xlabel, ylabel)
+
+	g = sns.jointplot(y=inc, x=w+1, ylim=(-0.07,1.07),xlim=(0.777,1500),\
+		kind='reg',annot_kws=dict(stat="r"),color='green',\
+		x_bins=[5,10,20,50,100,200,500,800],logx=1,\
+		joint_kws={'line_kws':{'color':'gray','markeredgewidth':0,\
+		'alpha':0.3, 'markeredgewidth':0}}).set_axis_labels(ylabel, xlabel)
+
+	ax = g.ax_joint
+	ax.set_xscale('log')
+	#g.ax_marg_y.set_xscale('log')
+	
+	#plt.grid(True)
+	plt.savefig('dir_edge_weight_vs_incon_float7s22scatter7777.pdf', dpi=500, bbox_inches='tight')
+
 
 def plot_edge_sc_vs_pop_diff_2(diff, tname):
 	coef_soc = 100
@@ -546,7 +594,9 @@ def status_inconsistency_scalar_igraph_assortativity(filename='node_scalar_incon
 	#print " MUTUAL node incosistency assortativity is %f and st. sign. is %f " % (r, s)
 
 
-plot_edge_weight_vs_inconsistency('weight_inconsistency_on_edge_float.dat')
+#plot_edge_weight_vs_inconsistency('weight_inconsistency_on_edge_float.dat')
+
+plot_edge_weight_vs_inconsistency_binning('weight_inconsistency_on_edge_float.dat')
 
 #status_inconsistency_igraph_assortativity()
 #status_inconsistency_scalar_igraph_assortativity()

@@ -342,7 +342,7 @@ def plot_sentiment_capital_seaborn(x, y, name_soc='deg'):
 	#g.ax_joint.set_yticklabels(labelsy)
 	#plt.tight_layout()
 
-	plt.savefig(name_soc  + 'setiment77.eps', bbox_inches='tight', dpi=550)
+	plt.savefig(name_soc  + 'setiment777777.eps', bbox_inches='tight', dpi=550)
 
 	"""
 	plt.ylabel('social capital: popularity' )
@@ -463,8 +463,8 @@ social_capital_vs_sem(soc=soc,sem='entities')
 #soc='weighted indegree'
 #social_capital_vs_sentiment(soc)
 
-#soc='weighted outdegree'
-#social_capital_vs_sentiment(soc)
+soc='weighted outdegree'
+social_capital_vs_sentiment(soc)
 
 #social_capital_vs_IN_OUT_sentiment_plot()
 

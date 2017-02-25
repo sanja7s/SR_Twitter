@@ -15,7 +15,7 @@ from collections import defaultdict
 import matplotlib
 from scipy import stats
 import seaborn as sns
-
+import math
 
 sns.set(style="white", color_codes=True, font_scale=2)
 from scipy.stats.stats import pearsonr
@@ -114,10 +114,123 @@ def plot_edge_weight_vs_SR():
 	print "Current size inches:", fig7s.get_size_inches()
 
 
+
+def plot_edge_weight_vs_SR_log():
+	s = read_in_edge_weight_SR()
+	w = []
+	inc = []
+	for el in s:
+		# weight
+		w.append(el)
+		# inconsistency
+		einc = s[el]
+		inc.append(einc)
+	w=np.array(w)
+	inc=np.array(inc)
+	print np.corrcoef(w,inc)
+	print pearsonr(w, inc)
+
+	plt.grid(0)
+	ylabel = '$CI(e)$'
+	xlabel = '$SR(e)$'
+	plt.clf()
+	plt.grid(0)
+	fig7s = plt.gcf()
+
+	plt.rcParams['figure.figsize']=((6,6))
+
+	"""
+	g = sns.jointplot(x=inc, y=np.log(w+1), kind="scatter", \
+		annot_kws=dict(stat="r"),\
+	 color="gold", xlim=(-0.07,1.07)).set_axis_labels(xlabel, ylabel)
+	"""
+	mybins=np.logspace(0,np.log(100),3000)
+
+	g = sns.JointGrid(y=inc, x=w,ylim=[-0.07,1.07])
+	g.plot_joint(plt.scatter, color='black', edgecolor='black')
+	ax = g.ax_joint
+	ax.set_xscale('log')
+	g.ax_marg_y.set_xscale('log')
+
+	plt.savefig( 'undir_edge_weight_vs_SR_scatter_log.eps', \
+		dpi=500, bbox_inches='tight')
+
+	
+	fig_size = plt.rcParams["figure.figsize"]
+	print "Current size:", fig_size
+	fig7s = plt.gcf()
+	print "Current size inches:", fig7s.get_size_inches()
+
+def plot_edge_weight_vs_SR_regplot():
+	s = read_in_edge_weight_SR()
+	w = []
+	inc = []
+	for el in s:
+		# weight
+		w.append(el)
+		# inconsistency
+		einc = s[el]
+		inc.append(einc)
+	w=np.array(w)
+	inc=np.array(inc)
+	print np.corrcoef(w,inc)
+	print pearsonr(w, inc)
+
+	plt.grid(0)
+	ylabel = '$CI(e)$'
+	xlabel = '$SR(e)$'
+	plt.clf()
+	plt.grid(0)
+	fig7s = plt.gcf()
+
+	plt.rcParams['figure.figsize']=((6,6))
+
+	"""
+	g = sns.jointplot(x=inc, y=np.log(w+1), kind="scatter", \
+		annot_kws=dict(stat="r"),\
+	 color="gold", xlim=(-0.07,1.07)).set_axis_labels(xlabel, ylabel)
+	
+	mybins=np.logspace(0,np.log(100),3000)
+
+	g = sns.JointGrid(y=inc, x=w,ylim=[-0.07,1.07])
+	g.plot_joint(plt.scatter, color='black', edgecolor='black')
+	ax = g.ax_joint
+	ax.set_xscale('log')
+	g.ax_marg_y.set_xscale('log')
+	"""
+
+	"""
+	ax = sns.regplot(y=inc, x=w, logx=1, x_bins=15, \
+		truncate=True, x_estimator=np.mean, fit_reg=1,\
+		line_kws={'color':'lightgray', 'alpha':0.1}
+		)
+	"""
+
+	g = sns.jointplot(y=inc, x=w+1, ylim=(-0.07,1.07),xlim=(0.777,2300),\
+		logx=1, kind='reg',annot_kws=dict(stat="r"),color='goldenrod',\
+		 x_bins=[1,10,20,50,100,200,500,1000,1500], \
+		joint_kws={'line_kws':{'color':'gray','markeredgewidth':0,\
+		'alpha':0.3, 'markeredgewidth':0}}).set_axis_labels(ylabel, xlabel)
+
+	ax = g.ax_joint
+	ax.set_xscale('log')
+	#g.ax_marg_y.set_xscale('log')
+
+	plt.savefig( 'undir_edge_weight_vs_SR_scatter_regplot777.pdf', \
+		dpi=500, bbox_inches='tight')
+
+	
+	fig_size = plt.rcParams["figure.figsize"]
+	print "Current size:", fig_size
+	fig7s = plt.gcf()
+	print "Current size inches:", fig7s.get_size_inches()
+
+
+
 """
 	Not to do now
 """
-def corr_edge_incon_SR():
+def corr_edge_incon_SR_log():
 
 	SR1 = read_in_edge_weight_SR()
 	inc1 = read_in_edge_weight_inconsistency()
@@ -126,4 +239,6 @@ def corr_edge_incon_SR():
 	inc=np.array(inc)
 	print np.corrcoef(SR,inc)
 
-plot_edge_weight_vs_SR()
+#plot_edge_weight_vs_SR()
+
+plot_edge_weight_vs_SR_regplot()
