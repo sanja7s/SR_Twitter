@@ -55,7 +55,7 @@ def pairwise_assortativity(G):
 	xaxis = []
 	f = open('sentiment/pairwise_assortativity.tab', 'w')
 
-	for threshold in np.arange(1, 25):
+	for threshold in np.arange(1, 100):
 		s, n = threshold_pairwise_assortativity(G, threshold)
 		sa.append(s)
 		ne.append(n)
@@ -119,7 +119,7 @@ def neighborhood_assortativity(G):
 	xaxis = []
 	f = open('sentiment/neighborhood/neighborhood_assortativity.tab', 'w')
 
-	for threshold in np.arange(1, 25):
+	for threshold in np.arange(1, 100):
 		s, n = threshold_neighborhood_assortativity(G, threshold)
 		sa.append(s)
 		ne.append(n)
@@ -253,6 +253,6 @@ def main():
 	G = read_in_recip()
 	nxaxis, nsa, nne = neighborhood_assortativity(G) 
 
-	plot_SA_both(xaxis, sa, ne, nsa, nne, 'sentimen_assortativity_v7.png')
+	plot_SA_both(xaxis, sa, ne, nsa, nne, 'sentimen_assortativity_100.png')
 
 main()

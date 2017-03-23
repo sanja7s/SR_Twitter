@@ -377,13 +377,15 @@ def plot_edge_weight_vs_inconsistency(fn):
 	fig7s.set_size_inches((6,6))
 	plt.figure(figsize=(6, 6))
 	sns.set_style("white")
-	g = sns.jointplot(x=inc, y=w, kind="scatter", annot_kws=dict(stat="r"),\
-	 color="green", xlim=(-1.07,1.07)).set_axis_labels(xlabel, ylabel)
+	g = sns.jointplot(x=w, y=inc, kind="scatter", stat_func=None, annot_kws=dict(stat="r"),\
+	 color="green", ylim=(-1.07,1.07)).set_axis_labels(ylabel, xlabel)
+	ticks = [0,300,600,900,1200,1500]
+	g.ax_joint.set_xticks(ticks)
 
 	#plt.tight_layout()
 	
 	#plt.grid(True)
-	plt.savefig('dir_edge_weight_vs_incon_float7s22scatter7777.eps', dpi=500, bbox_inches='tight')
+	plt.savefig('dir_edge_weight_vs_incon_float7s22scatter77777.eps', dpi=500, bbox_inches='tight')
 
 
 def plot_edge_weight_vs_inconsistency_binning(fn):
@@ -418,17 +420,25 @@ def plot_edge_weight_vs_inconsistency_binning(fn):
 	#g = sns.jointplot(x=inc, y=w, kind="scatter", annot_kws=dict(stat="r"),\
 	# color="green", xlim=(-1.07,1.07)).set_axis_labels(xlabel, ylabel)
 
-	g = sns.jointplot(y=inc, x=w+1, ylim=(-0.07,1.07),xlim=(0.777,1500),\
-		kind='reg',annot_kws=dict(stat="r"),color='green',\
-		x_bins=[5,10,20,50,100,200,500,800],logx=1,\
+	g = sns.jointplot(y=inc, x=w, ylim=(-1.07,1.07),xlim=(0.777,1500),\
+		kind='reg',color='green',stat_func=None,\
+		x_bins=[1,5,10,20,50,100,200,500,800],logx=1,\
 		joint_kws={'line_kws':{'color':'gray','markeredgewidth':0,\
 		'alpha':0.3, 'markeredgewidth':0}}).set_axis_labels(ylabel, xlabel)
 
 	ax = g.ax_joint
 	ax.set_xscale('log')
-	#g.ax_marg_y.set_xscale('log')
+	g.ax_marg_x.set_xscale('log')
+
+	(r, p) = pearsonr(np.log(w), inc)
+
+	print r,p
+
+ 	textstr = '$r=%.2f$, $p<10^{-5}$'%(r)
+
+	ax.text(0.30, 0.93, textstr, transform=ax.transAxes, fontsize=20,\
+		verticalalignment='top')
 	
-	#plt.grid(True)
 	plt.savefig('dir_edge_weight_vs_incon_float7s22scatter7777.pdf', dpi=500, bbox_inches='tight')
 
 

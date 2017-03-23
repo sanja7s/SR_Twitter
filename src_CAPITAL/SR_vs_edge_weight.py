@@ -205,25 +205,35 @@ def plot_edge_weight_vs_SR_regplot():
 		line_kws={'color':'lightgray', 'alpha':0.1}
 		)
 	"""
+	# no plotting r
+	#annot_kws=dict(stat="r"),
 
-	g = sns.jointplot(y=inc, x=w+1, ylim=(-0.07,1.07),xlim=(0.777,2300),\
-		logx=1, kind='reg',annot_kws=dict(stat="r"),color='goldenrod',\
+	
+
+	g = sns.jointplot(x=w,y=inc, xlim=(0.777,2300),ylim=(-0.07,1.07),\
+		logx=1, kind='reg',stat_func=None, color='goldenrod',\
 		 x_bins=[1,10,20,50,100,200,500,1000,1500], \
 		joint_kws={'line_kws':{'color':'gray','markeredgewidth':0,\
 		'alpha':0.3, 'markeredgewidth':0}}).set_axis_labels(ylabel, xlabel)
 
 	ax = g.ax_joint
 	ax.set_xscale('log')
-	#g.ax_marg_y.set_xscale('log')
+	g.ax_marg_x.set_xscale('log')
+
+	(r, p) = pearsonr(np.log(w), inc)
+
+	print r,p
+
+ 	textstr = '$r=%.2f$, $p<10^{-5}$'%(r)
+
+	ax.text(0.30, 0.93, textstr, transform=ax.transAxes, fontsize=20,\
+		verticalalignment='top')
 
 	plt.savefig( 'undir_edge_weight_vs_SR_scatter_regplot777.pdf', \
 		dpi=500, bbox_inches='tight')
 
-	
-	fig_size = plt.rcParams["figure.figsize"]
-	print "Current size:", fig_size
-	fig7s = plt.gcf()
-	print "Current size inches:", fig7s.get_size_inches()
+
+
 
 
 

@@ -19,13 +19,13 @@ sns.set(color_codes=True, font_scale=2)
 sns.set_style('whitegrid')
 
 
-WORKING_FOLDER = "../../../DATA/mention_graph/BigClam"
+WORKING_FOLDER = "../../../DATA/mention_graph/InfoMap"
 os.chdir(WORKING_FOLDER)
-F_IN = 'MENT_COMM7scmtyvv.txt'
+F_IN = 'ment_comm'
 f_in_graph = 'mention_graph_weights.dat'
 
 # DONE
-def output_basic_stats_BigClam_COMM():
+def output_basic_stats_COMM():
 	num_COMM = 0
 	COMM_sizes = []
 	input_file = codecs.open(F_IN, 'r', encoding='utf8')
@@ -43,12 +43,12 @@ def find_nodes_in_more_COMM():
 	nodes_num_COMM = defaultdict(int)
 	input_file = codecs.open(F_IN, 'r', encoding='utf8')
 	for line in input_file:
-		line = line.split()
-		for node in line:
-			nodes_num_COMM[int(node)] += 1
+		node, comm = line.split()
+		nodes_num_COMM[int(node)] += 1
 
 	#nodes_num_COMM2 = {node: nodes_num_COMM[node] if nodes_num_COMM[node] < 10 else 10 for node in nodes_num_COMM}
 	sorted_nodes_num_COMM = OrderedDict(sorted(nodes_num_COMM.items(), key=lambda t:t[1]))
+	print len(sorted_nodes_num_COMM)
 	return sorted_nodes_num_COMM
 
 def read_in_mention_graph():
@@ -211,8 +211,6 @@ def plot_interaction_comm_propensity():
 	print pearsonr(np.array(x), np.array(z))
 
 	plt.show()
-
-plot_interaction_comm_propensity()
 
 # nodes with highest avg COMM membership
 def find_overlapping_COMM():
@@ -454,7 +452,7 @@ def find_avg_sentiment_per_node_COMM_membership():
 	res = defaultdict(list)
 	for node in node_comm_membership:
 		n_sem = sem_cap[str(node)]
-		nCOMM = node_comm_membership[node] if node_comm_membership[node] < 10 else 10
+		nCOMM = node_comm_membership[node] if node_comm_membership[node] < 35 else 35
 		res[nCOMM].append(n_sem)
 	res_mean = defaultdict(float)
 	res_stdev = defaultdict(float)
@@ -472,8 +470,11 @@ def find_avg_deg_per_node_COMM_membership():
 	res = defaultdict(list)
 	for node in node_comm_membership:
 		n = G_undir.vs.select(name = str(node))
-		nCOMM = node_comm_membership[node] if node_comm_membership[node] < 10 else 10
-		res[nCOMM].append(G_undir.degree(n[0].index))
+		nCOMM = node_comm_membership[node] #if node_comm_membership[node] < 10 else 10
+		try:
+			res[nCOMM].append(G_undir.degree(n[0].index))
+		except IndexError:
+			print 'Index Error'
 	res_mean = defaultdict(float)
 	res_stdev = defaultdict(float)
 	for COMM in res:
@@ -490,8 +491,11 @@ def find_avg_WEIGHTED_deg_per_node_COMM_membership():
 	res = defaultdict(list)
 	for node in node_comm_membership:
 		n = G_undir.vs.select(name = str(node))
-		nCOMM = node_comm_membership[node] if node_comm_membership[node] < 10 else 10
-		res[nCOMM].append(G_undir.strength(n[0].index, weights='weight'))
+		nCOMM = node_comm_membership[node] if node_comm_membership[node] < 40 else 40
+		try:
+			res[nCOMM].append(G_undir.degree(n[0].index))
+		except IndexError:
+			print 'IndexError'
 	res_mean = defaultdict(float)
 	res_stdev = defaultdict(float)
 	for COMM in res:
@@ -504,13 +508,19 @@ def find_avg_DIR_deg_per_node_COMM_membership():
 	G = read_in_graph()
 	res_IN = defaultdict(list)
 	res_OUT = defaultdict(list)
+	cnt_IE = 0
 	for node in node_comm_membership:
-		n = G.vs.select(name = str(node))
-		IN_deg = G.strength(n[0].index, weights='weight', mode=IN)
-		OUT_deg = G.strength(n[0].index, weights='weight', mode=OUT)
-		nCOMM = node_comm_membership[node] if node_comm_membership[node] < 10 else 10
-		res_IN[nCOMM].append(IN_deg)
-		res_OUT[nCOMM].append(OUT_deg)
+		try:
+			n = G.vs.select(name = str(node))
+			IN_deg = G.strength(n[0].index, weights='weight', mode=IN)
+			OUT_deg = G.strength(n[0].index, weights='weight', mode=OUT)
+			nCOMM = node_comm_membership[node] if node_comm_membership[node] < 40 else 40
+			res_IN[nCOMM].append(IN_deg)
+			res_OUT[nCOMM].append(OUT_deg)
+		except IndexError:
+			print 'IndexError'
+			cnt_IE += 1
+	print 'Skipped nodes ', cnt_IE
 	res_IN_mean = defaultdict(float)
 	res_IN_std = defaultdict(float)
 	res_OUT_mean = defaultdict(float)
@@ -612,7 +622,7 @@ def plot_WEIGHTED_deg_vs_COMM_membership():
 	plt.xlim(0,11)
 	#plt.title(r'Histogram for mention network pairwise SR: $\mu=' +  "{:.3f}".format(mu) + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$')
 	plt.grid(True)
-	plt.savefig('node_comm_membership_vs_mean_strong_comm_intensity2.eps', dpi=550)
+	plt.savefig('node_comm_membership_vs_mean_strong_comm_intensity_40.eps', dpi=550)
 	plt.show()
 
 def plot_avg_neighborhood_SR_vs_COMM_membership():
@@ -729,7 +739,7 @@ def plot_sentiment_vs_COMM_membership():
 	#plt.ylim(-0.1,0.1)
 	#plt.title(r'Histogram for mention network pairwise SR: $\mu=' +  "{:.3f}".format(mu) + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$')
 	#plt.grid(True)
-	plt.savefig('node_comm_membership_vs_avg_sentiment.eps', dpi=550)
+	plt.savefig('node_comm_membership_vs_avg_sentiment_35.eps', dpi=550)
 	plt.show()
 
 def plot_DIR_deg_vs_COMM_membership():
@@ -752,10 +762,10 @@ def plot_DIR_deg_vs_COMM_membership():
 	plt.xlabel('node comm membership')
 	plt.ylabel('mean node social capital')
 	plt.legend(loc='best',frameon=False)
-	plt.xlim(0,11)
+	#plt.xlim(0,11)
 	plt.tight_layout()
 	#plt.grid(True)
-	plt.savefig('node_comm_membership_vs_avg_DIR_deg11777.eps', bbox_inches='tight' , dpi=550)
+	plt.savefig('node_comm_membership_vs_avg_DIR_deg_40.eps', bbox_inches='tight' , dpi=550)
 	plt.show()
 
 def plot_MEDIAN_DIR_deg_vs_COMM_membership():
@@ -773,17 +783,17 @@ def plot_MEDIAN_DIR_deg_vs_COMM_membership():
 	plt.legend(loc='best',frameon=False)
 	plt.xlim(0,11)
 	#plt.grid(True)
-	plt.savefig('node_comm_membership_vs_MEDIAN_DIR_deg3.eps', dpi=550)
+	plt.savefig('node_comm_membership_vs_DIR_deg_40.eps', dpi=550)
 	plt.show()
 
 #plot_DIR_deg_vs_COMM_membership()
 #plot_WEIGHTED_deg_vs_COMM_membership()
 #plot_MEDIAN_ST_INC_vs_COMM_membership()
-plot_sentiment_vs_COMM_membership()
+#plot_sentiment_vs_COMM_membership()
 #plot_avg_neighborhood_SR_vs_COMM_membership()
 #plot_SEM_CAP_vs_COMM_membership()
 #plot_DIR_deg_vs_COMM_membership()
-#plot_MEDIAN_DIR_deg_vs_COMM_membership()
+plot_DIR_deg_vs_COMM_membership()
 #plot_deg_vs_COMM_membership()
 #output_basic_stats_BigClam_COMM()
 #find_nodes_in_more_COMM()
@@ -793,3 +803,4 @@ plot_sentiment_vs_COMM_membership()
 #plot_COMM_size_vs_density()
 
 #plot_COMM_size_vs_MEDIAN_density()
+
