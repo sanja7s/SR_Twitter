@@ -13,6 +13,7 @@ import os
 import matplotlib.cm as cm
 from collections import defaultdict
 import matplotlib
+import pandas as pd
 
 from scipy.stats.stats import pearsonr
 
@@ -404,14 +405,86 @@ def plot_edge_sc_vs_pop_diff_2_seaborn(diff, tname):
 	plt.savefig(tname + 'scatter.eps', bbox_inches='tight')
 
 
+def find_BI_diff():
+
+	bi = pd.read_csv('BI_indexR_full.txt',\
+		encoding='utf-8', delim_whitespace=1)
+
+	print max(bi['bi']), min(bi['bi'])
+
+	bidict = bi.set_index('id')['bi'].to_dict()
+	cnt = 0
+	for el in bidict:
+		if bidict[el] > 1:
+			bidict[el] = 1
+			cnt += 1
+
+	res = []
+
+	f = open(f_in_graph_weights, 'r')
+	for line in f:
+		(n1, n2, w) = line.split()
+		res.append(bidict[int(n1)] - bidict[int(n2)])
+	print res
+	return res
+
+def plot_edge_BI_diff_distr_seaborn(x, tname):
+
+	x = np.array(x) 
+	mu = np.mean(x)
+	sigma = np.std(x)
+	med = np.median(x)
+
+	lab = '$\mu=' +  "{:.3f}".format(mu) \
+	 + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$'
+
+	xlabel = 'relative status: Burt\'s index'
+	ylabel = 'kde'
+
+	fig7s = plt.gcf()
+	plt.rcParams['figure.figsize']=(8,6)
+	fig7s.set_size_inches((8,6))
+	plt.figure(figsize=(8, 6))
+
+	print max(x)
+	#z = [xel if xel == 0 else np.log10(abs(xel))*np.sign(xel) for xel in x]
+	#print max(z)
+	#z = np.array(z)
+	z = x
+
+	with sns.axes_style("whitegrid"):
+		"""
+		g = sns.distplot(z, hist=0, \
+			#hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
+			color="r")
+		"""
+		g = sns.kdeplot(z,  c='r')
+	plt.title(lab)
+	#labels = [r'$ -10^{4} $', r'$ -10^{3} $', r'$ -10^{2} $', \
+	#r'$ -10^{1} $', r'$ 0 $', r'$ 10^1 $', r'$ 10^2 $', \
+	#r'$ 10^3 $', r'$ 10^4 $']
+	#g.set(xticklabels=labels)
+
+	plt.xlim(-1.1,1.1)
+
+	plt.xlabel(xlabel)
+	plt.ylabel(ylabel)
+
+	plt.tight_layout()	
+	plt.savefig(tname + 'BI7log.eps', bbox_inches='tight', dpi=550)
+
+
 #pop_diff = read_edge_popularity_diff('edge_src_dest_weighted_INdeg.dat')	
 #plot_edge_popularity_diff_distr_seaborn(pop_diff, 'popularity diff (source - receiver)')
 
-sc_diff = read_edge_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
-plot_edge_semantic_capital_diff_distr_seaborn(sc_diff,'sem cap diff (source - receiver)')
+#sc_diff = read_edge_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
+#plot_edge_semantic_capital_diff_distr_seaborn(sc_diff,'sem cap diff (source - receiver)')
 
 #pop_sc_diff = read_edge_popularity_and_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
 #plot_edge_sc_vs_pop_diff_2(pop_sc_diff, 'pop vs. sem cap status diff')
 
 #pop_sc_diff = read_edge_popularity_and_semantic_capital_diff('sem_capital_edge_src_dest_weighted_INdeg.dat')
 #plot_edge_sc_vs_pop_diff_2_seaborn(pop_sc_diff, 'pop vs. sem cap status diff')
+
+x = find_BI_diff()
+plot_edge_BI_diff_distr_seaborn(x, 'BI')

@@ -14,6 +14,7 @@ import matplotlib.cm as cm
 from collections import defaultdict
 import matplotlib
 from scipy.stats.stats import pearsonr
+import pandas as pd
 
 import seaborn as sns
 sns.set(color_codes=True, font_scale=2) 
@@ -169,15 +170,21 @@ def save_node_weighted_indegree():
 
 def read_soc_capital(soc_capital=soc_capital):
 	cap = defaultdict(int)
+	if soc == 'Burt\'s index':
+		return pd.read_csv('BI_indexR_full.txt',\
+			encoding='utf-8', delim_whitespace=1)
 	f = open(soc_capital, "r")
 	for line in f:
 		(n,d) = line.split('\t')
 		cap[int(n)] = float(d)
 	return cap
 
-def read_sem_capital(sem_capital=sem_capital):
+def read_sem_capital(sem_capital=sem_capital): 
 	cap = defaultdict(int)
-	f = open(sem_capital, "r")
+	if sem_capital == 'concepts':
+		f = open("CVs","r")
+	else:
+		f = open(sem_capital, "r")
 	for line in f:
 		try:
 			if sem_capital <> 'sentiment':
@@ -342,7 +349,7 @@ def plot_sentiment_capital_seaborn(x, y, name_soc='deg'):
 	#g.ax_joint.set_yticklabels(labelsy)
 	#plt.tight_layout()
 
-	plt.savefig(name_soc  + 'setiment777777.eps', bbox_inches='tight', dpi=550)
+	plt.savefig(name_soc  + 'sent.eps', bbox_inches='tight', dpi=550)
 
 	"""
 	plt.ylabel('social capital: popularity' )
@@ -454,8 +461,8 @@ def plot_capitals_seaborn(x, y, name_soc='degree', name_sem='CVs'):
 
 	plt.savefig(name_sem + name_soc + '77.eps', bbox_inches='tight', dpi=550)
 
-soc='weighted outdegree'
-social_capital_vs_sem(soc=soc,sem='entities')
+#soc='weighted outdegree'
+#social_capital_vs_sem(soc=soc,sem='entities')
 #social_capital_vs_sem(soc=soc,sem='entities')
 #social_capital_vs_sem(soc=soc,sem='concepts')
 
@@ -463,10 +470,122 @@ social_capital_vs_sem(soc=soc,sem='entities')
 #soc='weighted indegree'
 #social_capital_vs_sentiment(soc)
 
-soc='weighted outdegree'
-social_capital_vs_sentiment(soc)
+#soc='weighted outdegree'
+#social_capital_vs_sentiment(soc)
 
 #social_capital_vs_IN_OUT_sentiment_plot()
 
 #soc='outdegree'
 #social_capital_vs_status_inconsistency(soc=soc)
+def plot_BIcapitals_seaborn(x, y, name_soc, name_sem):
+	xlabel = 'social capital: Burt\'s index'
+	ylabel = 'semantic capital: ' + name_sem
+
+	sns.set_style("white")
+	g = sns.jointplot(x=np.log(x+1), y=y, kind="hex", annot_kws=dict(stat="r"), color="darkgreen").set_axis_labels(xlabel, ylabel)
+
+	#g.set(xticklabels=labels)
+	#g.ax_joint.set_xticklabels(labels)
+	#plt.tight_layout()
+
+	plt.savefig(name_sem + name_soc + '77.eps', bbox_inches='tight', dpi=550)
+
+def plot_sentiment_BIcapital_seaborn(x, y, name_soc='deg'):
+
+	xlabel = 'social capital: Burt\'s index'
+	ylabel = 'semantic capital: sentiment'
+
+	labelsy = ['-1','-0.5','0','0.5','1']
+	with sns.axes_style("white"):
+		g = sns.jointplot(x=x, y=y, kind="hex", annot_kws=dict(stat="r"), color="darkgreen").set_axis_labels(xlabel, ylabel)
+
+	#g.set(xticklabels=labels)
+	#g.ax_joint.set_xticklabels(labels)
+	#g.ax_joint.set_yticklabels(labelsy)
+	#plt.tight_layout()
+
+	plt.savefig(name_soc  + 'sent.eps', bbox_inches='tight', dpi=550)
+
+def BI_capital_vs_sentiment(soc, sem):
+
+	soc_cap = read_soc_capital(soc)
+	soc_cap = soc_cap.set_index('id')['bi'].to_dict()
+
+	for el in soc_cap:
+		if soc_cap[el] > 1:
+			soc_cap[el] = 1
+
+	sem_cap = read_sem_capital('sentiment')
+
+	print max(soc_cap.values())
+
+	cap = defaultdict(int)
+
+	soca = []
+	sema = []
+
+	for n in soc_cap:
+		if n in sem_cap:
+			v1 = math.ceil(soc_cap[n] * 10) / 10
+			v2 = math.ceil(sem_cap[n] * 10) / 10
+			soca.append(soc_cap[n])
+			sema.append(sem_cap[n])
+			if v1 in cap:
+				cap[v1][v2] += 1
+			else:
+				cap[v1] = defaultdict(float)
+				cap[v1][v2] += 1
+
+	soca = np.array(soca)
+	sema = np.array(sema)
+	print pearsonr(soca, sema)
+
+	plot_sentiment_BIcapital_seaborn(soca, sema, name_soc=soc)
+
+def BI_capital_vs_sem(soc,sem):
+
+	soc_cap = read_soc_capital(soc)
+	soc_cap = soc_cap.set_index('id')['bi'].to_dict()
+
+	for el in soc_cap:
+		if soc_cap[el] > 1:
+			soc_cap[el] = 1
+
+	sem_cap = read_sem_capital(sem)
+
+	max_soc_cap = max(soc_cap.values())
+	max_sem_cap = max(sem_cap.values())
+
+	print max_sem_cap, max_soc_cap
+
+	coef_sem = 100
+	soca = []
+	sema = []
+
+	cap = defaultdict(int)
+
+	for n in soc_cap:
+		if n in sem_cap:
+			v1 = math.ceil(soc_cap[n] * 100) / 100
+			v2 = sem_cap[n] / coef_sem
+			soca.append(soc_cap[n])
+			sema.append(sem_cap[n])
+			if v1 in cap:
+				cap[v1][v2] += 1
+			else:
+				cap[v1] = defaultdict(float)
+				cap[v1][v2] += 1
+
+	print soc, sem
+	soca = np.array(soca)
+	sema = np.array(sema)
+	print pearsonr(soca, sema)
+	plot_BIcapitals_seaborn(soca, sema, name_soc=soc, name_sem=sem)
+
+soc='Burt\'s index'
+BI_capital_vs_sentiment(soc=soc,sem='sentiment')
+
+#BI_capital_vs_sem(soc=soc,sem='entities')
+#BI_capital_vs_sem(soc=soc,sem='concepts')
+
+

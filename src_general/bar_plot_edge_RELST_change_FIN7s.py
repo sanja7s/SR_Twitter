@@ -5,13 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse, Polygon
 
-
-width = 0.37       # the width of the bars
+width = 0.97       # the width of the bars
 
 font = {'family' : 'sans-serif',
 		'variant' : 'normal',
         'weight' : 'light',
-        'size'   : 14}
+        'size'   : 13}
 
 matplotlib.rc('font', **font)
 
@@ -28,15 +27,18 @@ def plot_bars_with_stdev_MO(SRmeans, SRStd):
 	#width = 0.3       # the width of the bars
 
 	#ax = plt.subplot(223)
-	ax = plt.subplot2grid((4,2),(0, 0), colspan=2)
-	rects1 = ax.bar(ind, SRMeans, width, color='m', hatch="//", yerr=SRStd, label = 'Monthly Avg Rel Soc St')
+	ax = plt.subplot2grid((3,2),(0, 0), colspan=2)
+	#rects1 = ax.bar(ind, SRMeans, width, color='m', hatch="//", yerr=SRStd, label = 'Monthly Avg SR')
 
+	rects1 = ax.bar(ind, SRMeans, width, color='m', \
+		align='center', yerr=SRStd, linewidth=0, \
+		error_kw=dict(ecolor='gray', lw=1.5, capsize=2.7, capthick=1))
 
 	# add some text for labels, title and axes ticks
-	#ax.set_ylabel('Avg Rel Soc St')
+	#ax.set_ylabel('Avg SR')
 	ax.set_title('Whole network')
-	ax.set_xticks(ind + width)
-	ax.set_xticklabels(('Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov'))
+	ax.set_xticks(ind)
+	ax.set_xticklabels(('Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'))
 
 	ax.set_ylim([-1, 5])
 	ax.set_yticks((0,5))
@@ -49,7 +51,7 @@ def plot_bars_with_stdev_MO(SRmeans, SRStd):
 	    for rect in rects:
 	        height = rect.get_height()
 	        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
-	                '%.2f' % float(height),
+	                '%.3f' % float(height),
 	                ha='center', va='bottom')
 
 	autolabel(rects1)
@@ -62,15 +64,17 @@ def plot_bars_with_stdev_2(DeletionMeans, DeletionStd):
 	#width = 0.3       # the width of the bars
 
 	#ax = plt.subplot(322)
-	ax = plt.subplot2grid((4,2),(1, 1))
-	rects1 = ax.bar(ind, DeletionMeans, width, color='c', hatch='*', yerr=DeletionStd, label = 'Decomission')
-
+	ax = plt.subplot2grid((3,2),(1, 1))
+	#rects1 = ax.bar(ind, DeletionMeans, width, color='c', hatch='*', yerr=DeletionStd, label = 'decommission')
+	rects1 = ax.bar(ind, DeletionMeans, width, color='c', \
+		align='center', yerr=DeletionStd, linewidth=0, \
+		error_kw=dict(ecolor='gray', lw=1.5, capsize=2.7, capthick=1))
 
 	# add some text for labels, title and axes ticks
 	#ax.set_ylabel('Avg SR')
-	ax.set_title('Interaction decomission')
-	ax.set_xticks(ind + width)
-	ax.set_xticklabels(('Before', 'At decomission', 'After'))
+	ax.set_title('Interaction decommission')
+	ax.set_xticks(ind )
+	ax.set_xticklabels(('Before', 'At decommission', 'After'))
 
 	ax.set_ylim([-1, 5])
 	ax.set_yticks((0,5))
@@ -82,7 +86,7 @@ def plot_bars_with_stdev_2(DeletionMeans, DeletionStd):
 	    for rect in rects:
 	        height = rect.get_height()
 	        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
-	                '%.2f' % float(height),
+	                '%.3f' % float(height),
 	                ha='center', va='bottom')
 
 	autolabel(rects1)
@@ -95,16 +99,18 @@ def plot_bars_with_stdev_1(DeletionMeans, DeletionStd):
 	#width = 0.3       # the width of the bars
 
 	#ax = plt.subplot(321)
-	ax = plt.subplot2grid((4,2),(1, 0))
-	rects1 = ax.bar(ind, DeletionMeans, width, color='darkred',  hatch='x', yerr=DeletionStd, label = 'Activation')
-
+	ax = plt.subplot2grid((3,2),(1, 0))
+	#rects1 = ax.bar(ind, DeletionMeans, width, color='darkred',  hatch='x', yerr=DeletionStd, label = 'Activation')
+	rects1 = ax.bar(ind, DeletionMeans, width, color='darkred', \
+		align='center', yerr=DeletionStd, linewidth=0, \
+		error_kw=dict(ecolor='gray', lw=1.5, capsize=2.7, capthick=1))
 
 	# add some text for labels, title and axes ticks
-	#ax.set_ylabel('Avg Rel Soc St')
+	#ax.set_ylabel('Avg SR')
 	ax.set_title('Interaction activation')
-	ax.set_xticks(ind + width)
+	ax.set_xticks(ind )
 	ax.set_xticklabels(('Before', 'At activation', 'After'))
-	
+
 	ax.set_ylim([-1, 5])
 	ax.set_yticks((0,5))
 
@@ -116,7 +122,7 @@ def plot_bars_with_stdev_1(DeletionMeans, DeletionStd):
 	    for rect in rects:
 	        height = rect.get_height()
 	        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
-	                '%.2f' % float(height),
+	                '%.3f' % float(height),
 	                ha='center', va='bottom')
 
 	autolabel(rects1)
@@ -129,17 +135,21 @@ def plot_bars_with_stdev_7(formationDeletionMeans, formationDeletionStd):
 	#width = 0.3       # the width of the bars
 
 	ax = plt.subplot2grid((4,2),(2, 0), colspan=2)
-	rects1 = ax.bar(ind, formationDeletionMeans, width, color='y',  hatch='+', yerr=formationDeletionStd, label = 'Activation and decomission')
-
+	#rects1 = ax.bar(ind, formationDeletionMeans, width, color='y',  hatch='+', yerr=formationDeletionStd, label = 'Activation and decommission')
+	rects1 = ax.bar(ind, formationDeletionMeans, width, color='y', \
+		align='center', yerr=formationDeletionStd, linewidth=0, \
+		error_kw=dict(ecolor='gray', lw=1.5, capsize=2.7, capthick=1))
 
 	ax.set_ylim([-1, 5])
 	ax.set_yticks((0,5))
 	# add some text for labels, title and axes ticks
-	#ax.set_ylabel('Avg Rel Soc St')
-	ax.set_title('Status change on the interaction')
-	ax.set_xticks(ind + width)
-	ax.set_xticklabels(('Before', 'At activation', 'In the Mid', 'At decomission', 'After'))
+	#ax.set_ylabel('Avg SR')
+	ax.set_title('Non-persisting interactions')
+	ax.set_xticks(ind)
+	ax.set_xticklabels(('Before', 'At activation', 'At Mid', 'At decommission', 'After'))
 
+	#ax.set_xlim([])
+	#ax.set_yticks((-0.1,0.1,0.3))
 
 	#plt.legend(frameon=False)
 
@@ -149,7 +159,7 @@ def plot_bars_with_stdev_7(formationDeletionMeans, formationDeletionStd):
 	    for rect in rects:
 	        height = rect.get_height()
 	        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
-	                '%.2f' % float(height),
+	                '%.3f' % float(height),
 	                ha='center', va='bottom')
 
 	autolabel(rects1)
@@ -166,68 +176,48 @@ def plot_bars_with_stdev_7(formationDeletionMeans, formationDeletionStd):
 # V3
 
 N = 3
+# PERSISTING LINKS
+#formationNodeletionMeans = (0.0121447496769, 0.110398018511, 0.10617694085)
+#formationNodeletionStd = (0.0539546551446, 0.192962632767, 0.1715092024)
 
-#formationNodeletionMeans = (0.012145, 0.110398, 0.106177)
-#formationNodeletionStd = (0.053955, 0.192963, 0.171509)
+
+
 
 #processed 13492 edges 
 #Average SR 0.019252 and stdev 0.066896 before, at the time 0.097444, 0.176203 and after 0.070327, 0.138657 edges formation 
 
-#formationMeans = (0.019252, 0.097444 , 0.070327)
-#formationStd = (0.066896, 0.176203, 0.138657)
 
-#formationMeans = (9.132078, 9.717981, 8.969463)
-#formationStd = (9.132078, 21.033700, 14.425127)
+formationMeans = (1.06329676846, 1.52097539283, 1.64779128372)
+formationStd = (1.33783304439, 1.68830107127, 1.88146167301) 
 
-#formationMeans = (2.97398458346, 3.35672991402, 3.22265045953)
-#formationStd = (14.5673494118, 10.228554967, 6.70779046053)
 
-#formationMeans = (2.17630491926, 2.70540743522, 2.71986481412)
-#formationStd = (3.15964775795, 3.8723235949, 3.77149710905)
 
-formationMeans = (3.67395493626, 4.51882597095, 4.53024014231)
-formationStd = (14.6923402736, 10.814310864, 7.60636924556)
 
-formationNoDeletionMeans = (0.964889222681, 1.44874202028, 1.68794592565)
-formationNoDeletionStd = (1.30256068643, 1.64860382968, 1.94388833634)
-
-# For ONLY PERSISTING formations
-plt1 = plot_bars_with_stdev_1(formationNoDeletionMeans, formationNoDeletionStd)
-# for all formations
-#plt1 = plot_bars_with_stdev_1(formationMeans, formationStd)
+#plt3 = plot_bars_with_stdev_3(formationMeans, formationStd, formationNodeletionMeans, formationNodeletionStd)
+#plt3.savefig("/home/sscepano/Projects7s/Twitter-workspace/DATA/General/monthly_SR_change_list_of_users/edges_SR_change_v2.png", dpi=440)
+plt1 = plot_bars_with_stdev_1(formationMeans, formationStd)
 
 ###################################################################################
 # edge deletion two versions
 # v4 # V22 final
+
 N = 3
 
-#deletionNoformationMeans = (0.072700, 0.068026, 0.022971)
-#deletionNoformationStd = (0.123489, 0.140277, 0.074658)
+# PERSISTING LINKS
+deletionNoformationMeans = (0.0727004565385, 0.0680258988703, 0.0229713363971)
+deletionNoformationStd = (0.123489476215, 0.140276874039, 0.0746578827396)
+deletionNoformationMeans = (0.0727004565385, 0.0680258988703, 0.0229713363971)
+deletionNoformationStd = (0.123489476215, 0.140276874039, 0.0746578827396)
 
 #processed 10080 edges 
 # Average SR 0.038934 and stdev 0.090531 before, at the time 0.083006, 0.157389 and after 0.038228, 0.101566 edges deletion 
 
-#deletionMeans = (0.038934, 0.083006, 0.038228)
-#deletionStd = (0.090531, 0.157389, 0.101566)
+deletionMeans = (1.16101995042, 1.52591193484, 1.54066816196)
+deletionStd = (1.36105887603, 1.69996084625, 1.80123581372)
 
-#deletionNoformationMeans = (8.480853, 8.712103, 7.560913)
-#deletionNoformationStd = (34.624987, 22.163709, 13.956631)
-
-#deletionNoformationMeans = (3.26706349206, 3.44027777778, 3.19642857143)
-#deletionNoformationStd = (16.7550012229, 11.5805325803, 7.35757000995)
-
-# persisting deletions
-deletionNoformationMeans = (1.16101995042, 1.52591193484, 1.54066816196)
-deletionNoformationStd = (1.36105887603, 1.69996084625, 1.80123581372)
-
-deletionMeans = (4.09097222222, 4.59107142857, 4.40545634921)
-deletionStd = (16.8694437604, 12.1299118525, 8.12254785891)
-
-
-# for persisting
-plt2 = plot_bars_with_stdev_2(deletionNoformationMeans, deletionNoformationStd)
-# for all
-#plt2 = plot_bars_with_stdev_2(deletionMeans, deletionStd)
+#plt4 = plot_bars_with_stdev_4(deletionMeans, deletionStd, deletionNoformationMeans, deletionNoformationStd)
+# this final, no need for 2 types of deletion
+plt2 = plot_bars_with_stdev_2(deletionMeans, deletionStd)
 
 ###################################################################################
 # MONTHLY
@@ -241,6 +231,22 @@ N = 5
 # improved to discount for edges not present at the MO
 #SRMeans = (0.050, 0.053, 0.058, 0.061, 0.065)
 #SRStd = (0.123, 0.130, 0.134, 0.14, 0.147)
+
+# but i should not discount for edges not present
+# but as always with formation and deletion etc
+# consider the same set of edges as below
+"""
+Monthly edges  69960
+6 mention network SR: $\mu=0.018$, $\sigma= 0.077$
+Monthly edges  69960
+7 mention network SR: $\mu=0.026$, $\sigma= 0.094$
+Monthly edges  69960
+8 mention network SR: $\mu=0.038$, $\sigma= 0.111$
+Monthly edges  69960
+9 mention network SR: $\mu=0.048$, $\sigma= 0.126$
+Monthly edges  69960
+10 mention network SR: $\mu=0.055$, $\sigma= 0.137$
+"""
 SRMeans = (0.756911, 0.907188, 1.049831, 1.263494, 1.581871)
 SRStd = (1.075074, 1.254395, 1.398652, 1.711709, 2.107371)
 
@@ -261,18 +267,19 @@ def plot_bars_with_stdev_MO_2(SRmeans, SRStd):
 
 
 	#ax = plt.subplot(111)
-	ax = plt.subplot2grid((4,2),(3, 0), colspan=2)
-	rects1 = ax.bar(ind, SRmeans, width, color='r',  hatch='O', yerr=SRStd, label = 'Monthly Avg Rel Soc St')
+	ax = plt.subplot2grid((3,2),(2, 0), colspan=2)
+	#rects1 = ax.bar(ind, SRmeans, width, color='r',  hatch='O', yerr=SRStd, label = 'Monthly Avg SR')
+	rects1 = ax.bar(ind, SRmeans, width, color='r', \
+		align='center', yerr=SRStd, linewidth=0, \
+		error_kw=dict(ecolor='gray', lw=1.5, capsize=2.7, capthick=1))
 
 
 	# add some text for labels, title and axes ticks
-	#ax.set_ylabel('Avg Rel Soc St')
+	#ax.set_ylabel('Avg SR')
 	ax.set_title('Persisting interactions')
-	ax.set_xticks(ind + width)
-	ax.set_xticklabels(('Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov'))
+	ax.set_xticks(ind)
+	ax.set_xticklabels(('Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'))
 
-	#ax.set_ylim([-0.1, 0.35])
-	#ax.set_yticks((-0.1,0.1,0.3))
 	ax.set_ylim([-1, 5])
 	ax.set_yticks((0,5))
 
@@ -284,7 +291,7 @@ def plot_bars_with_stdev_MO_2(SRmeans, SRStd):
 	    for rect in rects:
 	        height = rect.get_height()
 	        ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
-	                '%.2f' % float(height),
+	                '%.3f' % float(height),
 	                ha='center', va='bottom')
 
 	autolabel(rects1)
@@ -304,32 +311,17 @@ N = 5
 #formationDeletionMeans = (0.023888, 0.088995, 0.087686, 0.086517, 0.009626)
 #formationDeletionStd = (0.073761, 0.163803, 0.156189, 0.160936, 0.039921)
 
-#formationDeletionMeans = (8.83810923341, 9.3989713446, 7.68298479087, 9.34668136174, 8.12821454813)
-#formationDeletionStd = (38.1328644866, 24.1286964744, 12.6131673996, 24.2443565601, 14.8904513016)
-
-formationDeletionMeans = (1.12747979427, 1.56808719079, 1.38498098859, 1.58645603723, 1.613397012)
-formationDeletionStd = (1.35650452374, 1.71205560699, 1.49017144356, 1.73298601092, 1.84822380219)
-
-
-
-
-plt7 = plot_bars_with_stdev_7(formationDeletionMeans, formationDeletionStd)
+#plt7 = plot_bars_with_stdev_7(formationDeletionMeans, formationDeletionStd)
 ###################################################################################
 
 N = 5
 
-#SRmeans = (0.077627, 0.073275, 0.069833, 0.064159, 0.073046)
-#SRStd = (0.158114, 0.160656, 0.151127, 0.149817, 0.155852)
-
-#SRMeans = (5.904096, 5.662549, 6.104681, 5.969116,  6.033810)
-#SRStd = (8.490351, 7.771688, 9.604471, 9.214502, 8.443850)
-
-# strong contacts
-SRMeans = (0.856632, 0.906697, 0.995124, 1.010403, 1.031534)
+SRmeans = (0.856632, 0.906697, 0.995124, 1.010403, 1.031534)
 SRStd = (1.114944, 1.194131, 1.283704, 1.245234, 1.317081)
 
-# persisting
-plt4 = plot_bars_with_stdev_MO_2(SRMeans, SRStd)
+
+
+plt4 = plot_bars_with_stdev_MO_2(SRmeans, SRStd)
 
 #plt.show()
 
@@ -338,9 +330,8 @@ plt4 = plot_bars_with_stdev_MO_2(SRMeans, SRStd)
 
 plt.tight_layout()
 fig = plt.gcf()
+plt.tight_layout()
 fig.set_size_inches(8.3,6.5)
-
-
-fig.suptitle('Relative status in terms of strong contacts', verticalalignment='center', horizontalalignment='center', size = 16)
-plt.savefig("/home/sscepano/Projects7s/Twitter-workspace/DATA/General/REL_ST_STRONG_CONTACTS_persisting_formations_deletions.eps", dpi=710)
+plt.tight_layout()
+plt.savefig("/home/sscepano/Projects7s/Twitter-workspace/DATA/General/monthly_SR_change_list_of_users/temporal_RELST_persisting_formations_deletions7s7s.eps", dpi=710)
 

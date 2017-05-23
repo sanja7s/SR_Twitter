@@ -52,8 +52,8 @@ def extract_edge_formation_REL_ST_with_STDEV_POP():
 			if MO_formation == 4 or MO_formation >= 10:
 				continue
 			# remove or no
-			if MO_deletion >= 6 and MO_deletion <= 10:
-				continue
+			#if MO_deletion >= 6 and MO_deletion <= 10:
+			#	continue
 			cnt += 1
 			userA = int(userA)
 			userB = int(userB)
@@ -261,8 +261,8 @@ def extract_edge_formation_REL_ST_with_STDEV_MUTUAL_UNW():
 			if MO_formation == 4 or MO_formation >= 10:
 				continue
 			# remove or no for only persiting edges
-			if (MO_deletion <= 11):
-				continue
+			#if (MO_deletion <= 11):
+			#	continue
 			cnt += 1
 			userA = int(userA)
 			userB = int(userB)

@@ -13,6 +13,7 @@ import os
 import matplotlib.cm as cm
 from collections import defaultdict
 import matplotlib
+import pandas as pd
 
 import seaborn as sns
 sns.set(color_codes=True, font_scale=2) 
@@ -38,6 +39,8 @@ f_out_sent_mention_graph = "directed_threshold0_sent_val.tab"
 IN_DIR = "../../../DATA/CAPITAL/"
 f_out_mention = "sentiment_assortativity_mention_2.txt"
 #########################
+
+f_in_graph_weights = "mention_graph_weights.dat"
 
 os.chdir(IN_DIR)
 
@@ -140,6 +143,8 @@ def create_distr_sent(x):
 	print d
 
 	return d
+
+
 
 def plot_cap_distr_7s(z, tname):
 
@@ -248,4 +253,54 @@ def plot_cap_distr_CVs(z, tname):
 
 #social_capital_distributions('entities', 'entities')
 
-social_capital_distributions('node_scalar_inconsistency_v2', 'status inconsistency')
+#social_capital_distributions('node_scalar_inconsistency_v2', 'status inconsistency')
+
+
+def plot_cap_distr_BI(z, tname):
+
+	z = np.array(z, dtype=np.float) 
+	mu = np.mean(z)
+	sigma = np.std(z)
+
+	lab = '$\mu=' +  "{:.3f}".format(mu) \
+	 + '$, $\sigma= ' + "{:.3f}".format(sigma) + '$'
+
+	fig7s = plt.gcf()
+	plt.rcParams['figure.figsize']=(6,6)
+	fig7s.set_size_inches((6,6))
+	plt.figure(figsize=(6, 6))
+
+	sns.distplot(z, bins=30, hist=0, \
+		#hist_kws={"histtype": "step", "linewidth": 1, "alpha": 0.3, "color": "g"}, \
+		color="r")
+	plt.title(lab)
+
+	plt.xlabel('Burt\'s index')
+	plt.ylabel('kde')
+	plt.xlim(-0.1,max(z)+0.1)
+	plt.tight_layout()
+
+	plt.savefig(tname + '_v7s.eps')
+
+def read_BI():
+	return pd.read_csv('BI_indexR_full.txt',\
+		encoding='utf-8', delim_whitespace=1)
+
+def BI_capital_distribution():
+	bi = read_BI()
+	print max(bi['bi']), min(bi['bi'])
+
+	bidict = bi.set_index('id')['bi'].to_dict()
+	cnt = 0
+	for el in bidict:
+		if bidict[el] > 1:
+			bidict[el] = 1
+			cnt += 1
+	print cnt
+	
+
+
+	plot_cap_distr_BI(bidict.values(), 'Burt\'s index')
+
+BI_capital_distribution()
+
